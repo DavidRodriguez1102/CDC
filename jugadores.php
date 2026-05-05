@@ -71,7 +71,7 @@ $jugadores = $stmt->fetchAll();
                             <h3><?php echo htmlspecialchars($jugador['nombre']); ?></h3>
                             <p><strong><?php echo strtoupper($jugador['genero']); ?></strong> • 
                                <?php echo htmlspecialchars($jugador['nombre_equipo']); ?></p>
-                            <p><strong>ID:</strong> <?php echo $jugador['id']; ?></p>
+                            <p><strong>Equipo ID:</strong> <?php echo $jugador['equipo_id']; ?></p>
                             <p><strong>F. Nac:</strong> <?php echo date('d/m/Y', strtotime($jugador['fecha_nacimiento'])); ?></p>
                             <p><strong>Federación:</strong> <?php echo htmlspecialchars($jugador['nombre_federacion']); ?></p>
                         </div>

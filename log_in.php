@@ -69,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             <button type="submit">Iniciar Sesión</button>
         </form>
-        <p style="text-align:center; margin-top: 1rem; font-size:0.9rem; color:#a0aec0;">¿Olvidó su contraseña?</p>
     </div>
 </body>
 </html>

@@ -93,12 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                value="FTBL-<?php echo date('Y'); ?>-<?php echo rand(100, 999); ?>">
                     </div>
                     
-                    <div class="form-group">
-                        <label>Identidad Visual</label>
-                        <input type="file" name="escudo" accept="image/png, image/svg+xml">
-                        <small>Formato PNG o SVG preferiblemente. Máx 2MB.</small>
-                    </div>
-                    
                     <button type="submit" class="btn btn-primary">Registrar Equipo</button>
                     <a href="equipos.php" class="btn btn-secondary">Cancelar</a>
                 </form>

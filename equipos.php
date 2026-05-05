@@ -1,13 +1,6 @@
 <?php
-
-// Verificar que el usuario esté autenticado
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /log_in');
-    exit;
-}
-
-// Acceder a la variable $pdo que está en el scope global
-global $pdo;
+require_once __DIR__ . '/includes/conexion.php';
+verificarAutenticacion();
 
 // Manejar eliminación de equipo
 if (isset($_POST['eliminar_equipo']) && isset($_POST['equipo_id'])) {
@@ -456,7 +449,7 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
 <form method="GET" action="equipos.php" style="display: flex; gap: 0.5rem;">
                         <input type="text" 
                                name="buscar" 
-                               placeholder=" Buscar equipos por nombre o ID..." 
+                               placeholder=" Buscar equipos por nombre o ID de federacion..." 
                                value="<?php echo htmlspecialchars($busqueda); ?>">
                         
                         <select name="federacion_id" class="filtro-select" onchange="this.form.submit()">
@@ -490,7 +483,7 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
                                     <?php echo htmlspecialchars($equipo['nombre']); ?>
                                 </h3>
                                 <span class="equipo-badge">
-                                    ID: <?php echo $equipo['id']; ?>
+                                    ID: <?php echo $equipo['federacion_id']; ?>
                                 </span>
                             </div>
                             

@@ -5,6 +5,6 @@ require_once 'includes/conexion.php';
 session_destroy();
 
 // Redirigir al login
-header('Location: log_in.php');
+header('Location: index.php');
 exit;
 ?>

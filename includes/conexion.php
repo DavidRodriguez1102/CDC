@@ -32,7 +32,7 @@ function verificarAutenticacion() {
 
 // Función para mostrar mensajes
 function mostrarMensaje($mensaje, $tipo = 'success') {
-    $icono = $tipo === 'success' ? '✅' : '❌';
+    $icono = $tipo === 'success' ? '✅' : '';
     $clase = $tipo === 'success' ? 'mensaje-success' : 'mensaje-error';
     return "<div class='mensaje $clase'>$icono $mensaje</div>";
 }

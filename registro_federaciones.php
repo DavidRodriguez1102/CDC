@@ -100,26 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     
                     <div class="form-group">
                         <label>Departamento *</label>
-                        <select name="departamento" required>
-                            <option value="">Seleccionar ▼</option>
-                            <option value="Madrid">Madrid</option>
-                            <option value="Barcelona">Barcelona</option>
-                            <option value="Valencia">Valencia</option>
-                            <option value="Sevilla">Sevilla</option>
-                            <option value="Bilbao">Bilbao</option>
-                        </select>
+                        <input type="text" name="departamento" placeholder="Departamento..." required>
                     </div>
                     
                     <div class="form-group">
                         <label>Municipio *</label>
-                        <select name="municipio" required>
-                            <option value="">Seleccionar ▼</option>
-                            <option value="Madrid Centro">Madrid Centro</option>
-                            <option value="Barcelona Centro">Barcelona Centro</option>
-                            <option value="Valencia Centro">Valencia Centro</option>
-                            <option value="Sevilla Centro">Sevilla Centro</option>
-                            <option value="Bilbao Centro">Bilbao Centro</option>
-                        </select>
+                        <input type="text" name="municipio" placeholder="Municipio..." required>
                     </div>
                     
                     <div class="form-group">
