@@ -1,12 +1,5 @@
 <?php
-require_once 'includes/conexion.php';
-
-function limpiarInput($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
+require_once __DIR__ . '/includes/conexion.php';
 
 // Redirigir si ya está logueado
 if (isset($_SESSION['usuario_id'])) {
@@ -17,9 +10,9 @@ if (isset($_SESSION['usuario_id'])) {
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = limpiarInput($_POST['username']);
-    $password = $_POST['password'];
+    $password = isset($_POST['password']) ? trim($_POST['password']) : '';
 
-    if (empty($username) || empty($password)) {
+    if (empty($username) || $password === '') {
         $error = 'Por favor, complete todos los campos.';
     } else {
         $stmt = $pdo->prepare("SELECT id, password_hash, nombre_completo, rol FROM usuarios WHERE username = :username AND activo = 1");
@@ -60,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div class="login-container">
-        <div class="logo">⚽ Federación de Fútbol</div>
+        <div class="logo"> Federación de Fútbol</div>
         <h2>Sistema de Gestión Profesional</h2>
         
         <?php if ($error): ?>

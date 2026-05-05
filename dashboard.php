@@ -18,16 +18,16 @@ $totalJugadores = $pdo->query("SELECT COUNT(*) FROM jugadores WHERE activo = 1")
     <div class="admin-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h1>⚽ Gestión Soccer</h1>
+                <h1> Gestión Soccer</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.php" class="active">📊 Dashboard</a>
-                <a href="federaciones.php">🏛️ Federaciones</a>
-                <a href="equipos.php">⚽ Equipos</a>
-                <a href="jugadores.php">👤 Jugadores</a>
+                <a href="dashboard.php" class="active"> Dashboard</a>
+                <a href="federaciones.php"> Federaciones</a>
+                <a href="equipos.php"> Equipos</a>
+                <a href="jugadores.php"> Jugadores</a>
                 <hr>
-                <a href="configuracion_usuarios.php">⚙️ Configuración</a>
-                <a href="log_out.php" style="color: #e53e3e;">🚪 Cerrar Sesión</a>
+                <a href="configuracion_usuarios.php"> Configuración</a>
+                <a href="log_out.php" style="color: #e53e3e;"> Cerrar Sesión</a>
             </nav>
         </aside>
         <main class="main-content">

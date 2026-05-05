@@ -80,6 +80,6 @@ INSERT INTO jugadores (nombre, fecha_nacimiento, genero, equipo_id) VALUES
 ('Alexia Putellas', '1994-02-04', 'femenino', 1),
 ('Aitana Bonmatí', '1998-01-18', 'femenino', 3);
 
--- Insertar usuario admin por defecto (contraseña: admin123)
+-- Insertar usuario admin por defecto (contraseña: password)
 INSERT INTO usuarios (username, password_hash, nombre_completo, rol) VALUES
 ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrador Principal', 'super_admin');

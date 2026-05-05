@@ -25,13 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar_jugador'])) 
         $tipo_mensaje = 'error';
     } else {
         try {
-            // Insertar en la BD. Usamos $id_jugador como un campo de texto de "Cédula" o "ID Oficial"
-            // Ya que en tu BD el campo 'id' es auto-incremental, asumiré que 'id del jugador' es un identificador externo.
-            // Si quieres guardarlo, debemos agregar una columna 'identificador_oficial' a la tabla jugadores, o usarlo como ID si cambias la BD.
-            // Por simplicidad, lo guardaremos en el nombre concatenado o mejor, agregar una columna.
-            // ¡IMPORTANTE! Como en tu SQL no tienes columna 'id_oficial', la omitiré del INSERT.
-            // Si quieres que ese ID sea el campo 'id', debes quitar AUTO_INCREMENT. Lo dejaremos como está tu SQL.
-            
+
             $stmt = $pdo->prepare("INSERT INTO jugadores (nombre, fecha_nacimiento, genero, equipo_id) VALUES (:nombre, :fecha_nacimiento, :genero, :equipo_id)");
             $stmt->execute([
                 ':nombre' => $nombre,

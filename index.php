@@ -155,7 +155,7 @@ if (isset($_SESSION['usuario_id'])) {
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">⚽ Federación de Fútbol</div>
+        <div class="logo"> Federación de Fútbol</div>
         <div class="nav-links">
             <a href="#federaciones">Federaciones</a>
             <a href="#equipos">Equipos</a>

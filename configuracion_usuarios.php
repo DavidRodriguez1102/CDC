@@ -63,16 +63,16 @@ if (isset($_POST['cambiar_password'])) {
     <div class="admin-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h1>⚽ Gestión Deportiva</h1>
+                <h1> Gestión Deportiva</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.php">📊 Dashboard</a>
-                <a href="federaciones.php">🏛️ Federaciones</a>
-                <a href="equipos.php">⚽ Equipos</a>
-                <a href="jugadores.php">👤 Jugadores</a>
+                <a href="dashboard.php"> Dashboard</a>
+                <a href="federaciones.php"> Federaciones</a>
+                <a href="equipos.php"> Equipos</a>
+                <a href="jugadores.php"> Jugadores</a>
                 <hr>
-                <a href="configuracion_usuarios.php" class="active">⚙️ Configuración</a>
-                <a href="log_out.php" style="color: #e53e3e;">🚪 Cerrar Sesión</a>
+                <a href="configuracion_usuarios.php" class="active"> Configuración</a>
+                <a href="log_out.php" style="color: #e53e3e;"> Cerrar Sesión</a>
             </nav>
         </aside>
         
