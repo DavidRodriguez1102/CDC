@@ -66,7 +66,6 @@ $jugadores = $stmt->fetchAll();
                 <div class="card">
                     <div style="display: flex; align-items: center; gap: 1rem;">
                         <div style="font-size: 2.5rem;">
-                            <?php echo $jugador['genero'] === 'masculino' ? '👨' : '👩'; ?>
                         </div>
                         <div>
                             <h3><?php echo htmlspecialchars($jugador['nombre']); ?></h3>

@@ -52,9 +52,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar_jugador'])) 
 </head>
 <body>
     <div class="admin-container">
-        <!-- Pegas el mismo menú lateral que en dashboard.php -->
         <aside class="sidebar">
-            <!-- ... menú igual ... -->
+            <div class="sidebar-header">
+                <h1> Gestión Soccer</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.php" class="active"> Dashboard</a>
+                <a href="federaciones.php"> Federaciones</a>
+                <a href="equipos.php"> Equipos</a>
+                <a href="jugadores.php"> Jugadores</a>
+                <hr>
+                <a href="configuracion_usuarios.php"> Configuración</a>
+                <a href="log_out.php" style="color: #e53e3e;"> Cerrar Sesión</a>
+            </nav>
         </aside>
         <main class="main-content">
             <h2>Registrar Jugador</h2>

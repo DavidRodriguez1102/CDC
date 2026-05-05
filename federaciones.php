@@ -79,12 +79,12 @@ $federaciones = $stmt->fetchAll();
                                 <td><?php echo htmlspecialchars($federacion['municipio']); ?></td>
                                 <td>
                                     <a href="ver_federacion.php?id=<?php echo $federacion['id']; ?>" 
-                                       class="btn btn-primary" style="padding: 0.5rem;">👁 Ver</a>
+                                       class="btn btn-primary" style="padding: 0.5rem;"> Ver</a>
                                     <a href="editar_federacion.php?id=<?php echo $federacion['id']; ?>" 
-                                       class="btn btn-secondary" style="padding: 0.5rem;">✏️ Editar</a>
+                                       class="btn btn-secondary" style="padding: 0.5rem;"> Editar</a>
                                     <a href="eliminar_federacion.php?id=<?php echo $federacion['id']; ?>" 
                                        class="btn btn-danger" style="padding: 0.5rem;" 
-                                       onclick="return confirm('¿Estás seguro de eliminar esta federación?')">🗑 Eliminar</a>
+                                       onclick="return confirm('¿Estás seguro de eliminar esta federación?')"> Eliminar</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
