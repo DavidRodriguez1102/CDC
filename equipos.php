@@ -73,7 +73,7 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Equipos - Gestión Deportiva</title>
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="css/admin.css">
     <style>
         /* Estilos específicos para la página de equipos */
         .equipos-header {

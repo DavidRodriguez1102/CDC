@@ -67,52 +67,59 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar_jugador'])) 
             </nav>
         </aside>
         <main class="main-content">
-            <h2>Registrar Jugador</h2>
-            <p>Complete los detalles a continuación para añadir un nuevo deportista.</p>
+            <header>
+                <h2>Registrar Jugador</h2>
+                <p>Complete los detalles a continuación para añadir un nuevo deportista.</p>
+            </header>
 
             <?php if ($mensaje): ?>
-                <div class="mensaje <?php echo $tipo_mensaje; ?>"><?php echo $mensaje; ?></div>
+                <div class="mensaje mensaje-<?php echo $tipo_mensaje; ?>"><?php echo $mensaje; ?></div>
             <?php endif; ?>
 
-            <form method="POST" enctype="multipart/form-data" class="form-principal">
-                <div class="foto-perfil">
-                    <p>Foto de Perfil</p>
-                    <input type="file" name="foto" accept="image/png, image/jpeg"> (Formatos: JPG, PNG. Máx 2MB)
-                </div>
+            <div class="form-container">
+                <h3>Información del Jugador</h3>
                 
-                <div class="form-grid">
-                    <label>Nombre Completo</label>
-                    <input type="text" name="nombre" placeholder="Ej: Juan Pérez García" required>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Nombre Completo *</label>
+                        <input type="text" name="nombre" placeholder="Ej: Juan Pérez García" required>
+                    </div>
 
-                    <label>ID del Jugador (Documento)</label>
-                    <input type="text" name="id_jugador" placeholder="Ej: 12549" required>
+                    <div class="form-group">
+                        <label>ID del Jugador (Documento) *</label>
+                        <input type="text" name="id_jugador" placeholder="Ej: 12549" required>
+                    </div>
                     
-                    <label>Fecha de Nacimiento</label>
-                    <input type="date" name="fecha_nacimiento" required>
+                    <div class="form-group">
+                        <label>Fecha de Nacimiento *</label>
+                        <input type="date" name="fecha_nacimiento" required>
+                    </div>
                     
-                    <label>Género</label>
-                    <select name="genero" required>
-                        <option value="">Seleccione una opción</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="femenino">Femenino</option>
-                    </select>
+                    <div class="form-group">
+                        <label>Género *</label>
+                        <select name="genero" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                        </select>
+                    </div>
 
-                    <label>Asignar Equipo</label>
-                    <select name="equipo_id" required>
-                        <option value="">Seleccione un equipo</option>
-                        <?php foreach ($equipos as $equipo): ?>
-                            <option value="<?php echo $equipo['id']; ?>">
-                                <?php echo htmlspecialchars($equipo['nombre']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label>Asignar Equipo *</label>
+                        <select name="equipo_id" required>
+                            <option value="">Seleccione un equipo</option>
+                            <?php foreach ($equipos as $equipo): ?>
+                                <option value="<?php echo $equipo['id']; ?>">
+                                    <?php echo htmlspecialchars($equipo['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                <div class="form-acciones">
-                    <a href="dashboard.php" class="btn-cancelar">Cancelar</a>
-                    <button type="submit" name="registrar_jugador" class="btn-guardar">Registrar Jugador</button>
-                </div>
-            </form>
+                    <button type="submit" name="registrar_jugador" class="btn btn-primary">Registrar Jugador</button>
+                    <a href="jugadores.php" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
         </main>
     </div>
 </body>

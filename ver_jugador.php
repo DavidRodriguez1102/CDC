@@ -247,7 +247,7 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
                         </div>
                         
                         <div class="info-card">
-                            <h4>⚧ Género</h4>
+                            <h4> Género</h4>
                             <p>
                                 <span class="badge-genero badge-<?php echo $jugador['genero']; ?>">
                                     <?php echo ucfirst($jugador['genero']); ?>
