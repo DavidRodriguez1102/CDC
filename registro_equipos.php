@@ -17,15 +17,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $mensaje = 'El nombre y la federación son obligatorios';
         $tipo_mensaje = 'error';
     } else {
-        try {
-            $stmt = $pdo->prepare("INSERT INTO equipos (nombre, federacion_id) VALUES (:nombre, :federacion_id)");
-            $stmt->execute([':nombre' => $nombre, ':federacion_id' => $federacion_id]);
-            
-            $mensaje = 'Equipo registrado exitosamente';
-            $tipo_mensaje = 'success';
-        } catch (PDOException $e) {
-            $mensaje = 'Error al registrar: ' . $e->getMessage();
+        // Verificar si ya existe un equipo con el mismo nombre en la misma federación
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE nombre = :nombre AND federacion_id = :federacion_id AND activo = 1");
+        $stmtCheck->execute([':nombre' => $nombre, ':federacion_id' => $federacion_id]);
+        $existe = $stmtCheck->fetchColumn();
+        
+        if ($existe > 0) {
+            $mensaje = 'Ya existe un equipo con este nombre en la federación seleccionada';
             $tipo_mensaje = 'error';
+        } else {
+            try {
+                $stmt = $pdo->prepare("INSERT INTO equipos (nombre, federacion_id) VALUES (:nombre, :federacion_id)");
+                $stmt->execute([':nombre' => $nombre, ':federacion_id' => $federacion_id]);
+                
+                $mensaje = 'Equipo registrado exitosamente';
+                $tipo_mensaje = 'success';
+            } catch (PDOException $e) {
+                $mensaje = 'Error al registrar: ' . $e->getMessage();
+                $tipo_mensaje = 'error';
+            }
         }
     }
 }

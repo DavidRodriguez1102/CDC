@@ -63,38 +63,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
         $mensaje = 'Todos los campos obligatorios (*) deben ser completados.';
         $tipo_mensaje = 'error';
     } else {
-        try {
-            $stmt = $pdo->prepare("
-                UPDATE federaciones 
-                SET nombre = :nombre, 
-                    fecha_fundacion = :fecha_fundacion, 
-                    departamento = :departamento, 
-                    municipio = :municipio, 
-                    complemento = :complemento 
-                WHERE id = :id
-            ");
-            $stmt->execute([
-                ':nombre' => $nombre,
-                ':fecha_fundacion' => $fecha_fundacion,
-                ':departamento' => $departamento,
-                ':municipio' => $municipio,
-                ':complemento' => $complemento,
-                ':id' => $id
-            ]);
-            
-            $mensaje = 'Federación actualizada exitosamente.';
-            $tipo_mensaje = 'success';
-            
-            // Actualizar datos en la variable
-            $federacion['nombre'] = $nombre;
-            $federacion['fecha_fundacion'] = $fecha_fundacion;
-            $federacion['departamento'] = $departamento;
-            $federacion['municipio'] = $municipio;
-            $federacion['complemento'] = $complemento;
-            
-        } catch (PDOException $e) {
-            $mensaje = 'Error al actualizar: ' . $e->getMessage();
+        // Verificar si ya existe otra federación con el mismo nombre
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM federaciones WHERE nombre = :nombre AND activo = 1 AND id != :id");
+        $stmtCheck->execute([':nombre' => $nombre, ':id' => $id]);
+        $existe = $stmtCheck->fetchColumn();
+        
+        if ($existe > 0) {
+            $mensaje = 'Ya existe otra federación con este nombre.';
             $tipo_mensaje = 'error';
+        } else {
+            try {
+                $stmt = $pdo->prepare("
+                    UPDATE federaciones 
+                    SET nombre = :nombre, 
+                        fecha_fundacion = :fecha_fundacion, 
+                        departamento = :departamento, 
+                        municipio = :municipio, 
+                        complemento = :complemento 
+                    WHERE id = :id
+                ");
+                $stmt->execute([
+                    ':nombre' => $nombre,
+                    ':fecha_fundacion' => $fecha_fundacion,
+                    ':departamento' => $departamento,
+                    ':municipio' => $municipio,
+                    ':complemento' => $complemento,
+                    ':id' => $id
+                ]);
+                
+                $mensaje = 'Federación actualizada exitosamente.';
+                $tipo_mensaje = 'success';
+                
+                // Actualizar datos en la variable
+                $federacion['nombre'] = $nombre;
+                $federacion['fecha_fundacion'] = $fecha_fundacion;
+                $federacion['departamento'] = $departamento;
+                $federacion['municipio'] = $municipio;
+                $federacion['complemento'] = $complemento;
+                
+            } catch (PDOException $e) {
+                $mensaje = 'Error al actualizar: ' . $e->getMessage();
+                $tipo_mensaje = 'error';
+            }
         }
     }
 }

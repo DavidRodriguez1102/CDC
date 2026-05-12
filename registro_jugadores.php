@@ -24,21 +24,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar_jugador'])) 
         $mensaje = 'Género no válido.';
         $tipo_mensaje = 'error';
     } else {
-        try {
-
-            $stmt = $pdo->prepare("INSERT INTO jugadores (nombre, fecha_nacimiento, genero, equipo_id) VALUES (:nombre, :fecha_nacimiento, :genero, :equipo_id)");
-            $stmt->execute([
-                ':nombre' => $nombre,
-                ':fecha_nacimiento' => $fecha_nacimiento,
-                ':genero' => $genero,
-                ':equipo_id' => $equipo_id
-            ]);
-            
-            $mensaje = "¡Jugador '$nombre' registrado exitosamente!";
-            $tipo_mensaje = 'success';
-        } catch (PDOException $e) {
-            $mensaje = "Error al guardar: " . $e->getMessage();
+        // Verificar si ya existe un jugador con exactamente la misma información
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM jugadores WHERE nombre = :nombre AND fecha_nacimiento = :fecha_nacimiento AND genero = :genero AND equipo_id = :equipo_id AND activo = 1");
+        $stmtCheck->execute([
+            ':nombre' => $nombre,
+            ':fecha_nacimiento' => $fecha_nacimiento,
+            ':genero' => $genero,
+            ':equipo_id' => $equipo_id
+        ]);
+        $existe = $stmtCheck->fetchColumn();
+        
+        if ($existe > 0) {
+            $mensaje = 'Ya existe un jugador con exactamente la misma información (nombre, fecha de nacimiento, género y equipo).';
             $tipo_mensaje = 'error';
+        } else {
+            try {
+
+                $stmt = $pdo->prepare("INSERT INTO jugadores (nombre, fecha_nacimiento, genero, equipo_id) VALUES (:nombre, :fecha_nacimiento, :genero, :equipo_id)");
+                $stmt->execute([
+                    ':nombre' => $nombre,
+                    ':fecha_nacimiento' => $fecha_nacimiento,
+                    ':genero' => $genero,
+                    ':equipo_id' => $equipo_id
+                ]);
+                
+                $mensaje = "¡Jugador '$nombre' registrado exitosamente!";
+                $tipo_mensaje = 'success';
+            } catch (PDOException $e) {
+                $mensaje = "Error al guardar: " . $e->getMessage();
+                $tipo_mensaje = 'error';
+            }
         }
     }
 }

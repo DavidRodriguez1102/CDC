@@ -63,29 +63,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_equipo'])) 
         $mensaje = 'El nombre y la federación son obligatorios.';
         $tipo_mensaje = 'error';
     } else {
-        try {
-            $stmt = $pdo->prepare("
-                UPDATE equipos 
-                SET nombre = :nombre, 
-                    federacion_id = :federacion_id 
-                WHERE id = :id
-            ");
-            $stmt->execute([
-                ':nombre' => $nombre,
-                ':federacion_id' => $federacion_id,
-                ':id' => $id
-            ]);
-            
-            $mensaje = 'Equipo actualizado exitosamente.';
-            $tipo_mensaje = 'success';
-            
-            // Actualizar datos en la variable
-            $equipo['nombre'] = $nombre;
-            $equipo['federacion_id'] = $federacion_id;
-            
-        } catch (PDOException $e) {
-            $mensaje = 'Error al actualizar: ' . $e->getMessage();
+        // Verificar si ya existe otro equipo con el mismo nombre en la misma federación
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE nombre = :nombre AND federacion_id = :federacion_id AND activo = 1 AND id != :id");
+        $stmtCheck->execute([':nombre' => $nombre, ':federacion_id' => $federacion_id, ':id' => $id]);
+        $existe = $stmtCheck->fetchColumn();
+        
+        if ($existe > 0) {
+            $mensaje = 'Ya existe otro equipo con este nombre en la federación seleccionada.';
             $tipo_mensaje = 'error';
+        } else {
+            try {
+                $stmt = $pdo->prepare("
+                    UPDATE equipos 
+                    SET nombre = :nombre, 
+                        federacion_id = :federacion_id 
+                    WHERE id = :id
+                ");
+                $stmt->execute([
+                    ':nombre' => $nombre,
+                    ':federacion_id' => $federacion_id,
+                    ':id' => $id
+                ]);
+                
+                $mensaje = 'Equipo actualizado exitosamente.';
+                $tipo_mensaje = 'success';
+                
+                // Actualizar datos en la variable
+                $equipo['nombre'] = $nombre;
+                $equipo['federacion_id'] = $federacion_id;
+                
+            } catch (PDOException $e) {
+                $mensaje = 'Error al actualizar: ' . $e->getMessage();
+                $tipo_mensaje = 'error';
+            }
         }
     }
 }

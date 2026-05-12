@@ -18,22 +18,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $mensaje = 'Todos los campos marcados con * son obligatorios';
         $tipo_mensaje = 'error';
     } else {
-        try {
-            $stmt = $pdo->prepare("INSERT INTO federaciones (nombre, fecha_fundacion, departamento, municipio, complemento) 
-                                   VALUES (:nombre, :fecha_fundacion, :departamento, :municipio, :complemento)");
-            $stmt->execute([
-                ':nombre' => $nombre,
-                ':fecha_fundacion' => $fecha_fundacion,
-                ':departamento' => $departamento,
-                ':municipio' => $municipio,
-                ':complemento' => $complemento
-            ]);
-            
-            $mensaje = 'Federación registrada exitosamente';
-            $tipo_mensaje = 'success';
-        } catch (PDOException $e) {
-            $mensaje = 'Error al registrar: ' . $e->getMessage();
+        // Verificar si ya existe una federación con el mismo nombre
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM federaciones WHERE nombre = :nombre AND activo = 1");
+        $stmtCheck->execute([':nombre' => $nombre]);
+        $existe = $stmtCheck->fetchColumn();
+        
+        if ($existe > 0) {
+            $mensaje = 'Ya existe una federación con este nombre';
             $tipo_mensaje = 'error';
+        } else {
+            try {
+                $stmt = $pdo->prepare("INSERT INTO federaciones (nombre, fecha_fundacion, departamento, municipio, complemento) 
+                                       VALUES (:nombre, :fecha_fundacion, :departamento, :municipio, :complemento)");
+                $stmt->execute([
+                    ':nombre' => $nombre,
+                    ':fecha_fundacion' => $fecha_fundacion,
+                    ':departamento' => $departamento,
+                    ':municipio' => $municipio,
+                    ':complemento' => $complemento
+                ]);
+                
+                $mensaje = 'Federación registrada exitosamente';
+                $tipo_mensaje = 'success';
+            } catch (PDOException $e) {
+                $mensaje = 'Error al registrar: ' . $e->getMessage();
+                $tipo_mensaje = 'error';
+            }
         }
     }
 }

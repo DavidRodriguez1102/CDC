@@ -70,35 +70,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
         $mensaje = 'Género no válido.';
         $tipo_mensaje = 'error';
     } else {
-        try {
-            $stmt = $pdo->prepare("
-                UPDATE jugadores 
-                SET nombre = :nombre, 
-                    fecha_nacimiento = :fecha_nacimiento, 
-                    genero = :genero, 
-                    equipo_id = :equipo_id 
-                WHERE id = :id
-            ");
-            $stmt->execute([
-                ':nombre' => $nombre,
-                ':fecha_nacimiento' => $fecha_nacimiento,
-                ':genero' => $genero,
-                ':equipo_id' => $equipo_id,
-                ':id' => $id
-            ]);
-            
-            $mensaje = 'Jugador actualizado exitosamente.';
-            $tipo_mensaje = 'success';
-            
-            // Actualizar datos del jugador en la variable
-            $jugador['nombre'] = $nombre;
-            $jugador['fecha_nacimiento'] = $fecha_nacimiento;
-            $jugador['genero'] = $genero;
-            $jugador['equipo_id'] = $equipo_id;
-            
-        } catch (PDOException $e) {
-            $mensaje = 'Error al actualizar: ' . $e->getMessage();
+        // Verificar si ya existe otro jugador con exactamente la misma información
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM jugadores WHERE nombre = :nombre AND fecha_nacimiento = :fecha_nacimiento AND genero = :genero AND equipo_id = :equipo_id AND activo = 1 AND id != :id");
+        $stmtCheck->execute([
+            ':nombre' => $nombre,
+            ':fecha_nacimiento' => $fecha_nacimiento,
+            ':genero' => $genero,
+            ':equipo_id' => $equipo_id,
+            ':id' => $id
+        ]);
+        $existe = $stmtCheck->fetchColumn();
+        
+        if ($existe > 0) {
+            $mensaje = 'Ya existe otro jugador con exactamente la misma información (nombre, fecha de nacimiento, género y equipo).';
             $tipo_mensaje = 'error';
+        } else {
+            try {
+                $stmt = $pdo->prepare("
+                    UPDATE jugadores 
+                    SET nombre = :nombre, 
+                        fecha_nacimiento = :fecha_nacimiento, 
+                        genero = :genero, 
+                        equipo_id = :equipo_id 
+                    WHERE id = :id
+                ");
+                $stmt->execute([
+                    ':nombre' => $nombre,
+                    ':fecha_nacimiento' => $fecha_nacimiento,
+                    ':genero' => $genero,
+                    ':equipo_id' => $equipo_id,
+                    ':id' => $id
+                ]);
+                
+                $mensaje = 'Jugador actualizado exitosamente.';
+                $tipo_mensaje = 'success';
+                
+                // Actualizar datos del jugador en la variable
+                $jugador['nombre'] = $nombre;
+                $jugador['fecha_nacimiento'] = $fecha_nacimiento;
+                $jugador['genero'] = $genero;
+                $jugador['equipo_id'] = $equipo_id;
+                
+            } catch (PDOException $e) {
+                $mensaje = 'Error al actualizar: ' . $e->getMessage();
+                $tipo_mensaje = 'error';
+            }
         }
     }
 }
