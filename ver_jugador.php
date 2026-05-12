@@ -76,14 +76,15 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
     <link rel="stylesheet" href="css/admin.css">
     <style>
         .perfil-container {
-            background: white;
+            background: #0d1a15;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #1a2e25;
             overflow: hidden;
         }
         
         .perfil-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a110e 0%, #0d1a15 100%);
+            border-bottom: 2px solid #00ff88;
             color: white;
             padding: 2rem;
             text-align: center;
@@ -93,23 +94,25 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: rgba(0, 255, 136, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 4rem;
             margin: 0 auto 1rem;
-            border: 4px solid white;
+            border: 2px solid #00ff88;
+            color: #00ff88;
         }
         
         .perfil-header h2 {
             font-size: 1.8rem;
             margin-bottom: 0.5rem;
+            color: #ffffff;
         }
         
         .perfil-header .rol {
             font-size: 1rem;
-            opacity: 0.9;
+            color: #cbd5e1;
         }
         
         .perfil-body {
@@ -124,21 +127,21 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
         }
         
         .info-card {
-            background: #f7fafc;
+            background: #050a08;
             padding: 1.5rem;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #00ff88;
         }
         
         .info-card h4 {
-            color: #4a5568;
+            color: #94a3b8;
             font-size: 0.85rem;
             text-transform: uppercase;
             margin-bottom: 0.5rem;
         }
         
         .info-card p {
-            color: #2d3748;
+            color: #cbd5e1;
             font-size: 1.1rem;
             font-weight: 500;
         }
@@ -152,13 +155,15 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
         }
         
         .badge-masculino {
-            background: #bee3f8;
-            color: #2b6cb0;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid #00ff88;
         }
         
         .badge-femenino {
-            background: #fed7e2;
-            color: #c53030;
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 1px solid #ff4444;
         }
         
         .acciones {
@@ -166,7 +171,7 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
             gap: 1rem;
             margin-top: 2rem;
             padding-top: 2rem;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid #1a2e25;
         }
         
         .btn {
@@ -184,31 +189,34 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
         }
         
         .btn-primary {
-            background: #2b6cb0;
-            color: white;
+            background: #00ff88;
+            color: #050a08;
         }
         
         .btn-primary:hover {
-            background: #2c5282;
+            background: rgba(0, 255, 136, 0.8);
             transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
         }
         
         .btn-secondary {
-            background: #718096;
-            color: white;
+            background: #1a2e25;
+            color: #00ff88;
+            border: 1px solid #1a2e25;
         }
         
         .btn-secondary:hover {
-            background: #4a5568;
+            background: #0d1a15;
+            border-color: #00ff88;
         }
         
         .btn-danger {
-            background: #e53e3e;
+            background: #ff4444;
             color: white;
         }
         
         .btn-danger:hover {
-            background: #c53030;
+            background: #dd3333;
         }
     </style>
 </head>

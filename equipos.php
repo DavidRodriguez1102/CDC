@@ -93,107 +93,46 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
         .stat-mini {
             text-align: center;
             padding: 0.5rem 1rem;
-            background: white;
+            background: #0d1a15;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #1a2e25;
         }
         
         .stat-mini .number {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #2b6cb0;
+            color: #00ff88;
         }
         
         .stat-mini .label {
             font-size: 0.8rem;
-            color: #718096;
+            color: #94a3b8;
         }
         
-        .filtros-bar {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .search-box {
-            flex: 1;
-            min-width: 250px;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-        }
-        
-        .search-box input:focus {
-            outline: none;
-            border-color: #2b6cb0;
-            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
-        }
-        
-        .filtro-select {
-            padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: white;
-            cursor: pointer;
-            min-width: 200px;
-        }
-        
-        .filtro-select:focus {
-            outline: none;
-            border-color: #2b6cb0;
-        }
-        
-        .btn-limpiar {
-            padding: 0.75rem 1.5rem;
-            background: #edf2f7;
-            color: #4a5568;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: background 0.3s;
-        }
-        
-        .btn-limpiar:hover {
-            background: #e2e8f0;
-        }
-        
-        .equipos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
         
         .equipo-card {
-            background: white;
+            background: #0d1a15;
             border-radius: 12px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             overflow: hidden;
             transition: all 0.3s;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #1a2e25;
         }
         
         .equipo-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
         }
         
         .equipo-card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a110e 0%, #0d1a15 100%);
             color: white;
             padding: 1.5rem;
             position: relative;
+            border-bottom: 2px solid #00ff88;
         }
         
         .equipo-card-header h3 {
@@ -201,66 +140,7 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
             margin-bottom: 0.5rem;
         }
         
-        .equipo-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-        
-        .equipo-card-body {
-            padding: 1.5rem;
-        }
-        
-        .equipo-info {
-            margin-bottom: 0.75rem;
-        }
-        
-        .equipo-info strong {
-            color: #4a5568;
-            display: block;
-            font-size: 0.85rem;
-            margin-bottom: 0.25rem;
-        }
-        
-        .equipo-info span {
-            color: #2d3748;
-            font-size: 1rem;
-        }
-        
-        .jugadores-count {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 1rem 0;
-            padding: 0.75rem;
-            background: #f7fafc;
-            border-radius: 8px;
-        }
-        
-        .jugadores-count .icon {
-            font-size: 1.5rem;
-        }
-        
-        .jugadores-count .count {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #2b6cb0;
-        }
-        
-        .jugadores-count .text {
-            color: #718096;
-            font-size: 0.9rem;
-        }
-        
-        .equipo-card-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e2e8f0;
-        }
+        /* ... */
         
         .btn-sm {
             padding: 0.5rem 1rem;
@@ -277,111 +157,32 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
         }
         
         .btn-ver {
-            background: #ebf4ff;
-            color: #2b6cb0;
+            background: #1a2e25;
+            color: #00ff88;
         }
         
         .btn-ver:hover {
-            background: #bee3f8;
+            background: #0d1a15;
+            border: 1px solid #00ff88;
         }
         
         .btn-editar {
-            background: #fefcbf;
-            color: #975a16;
+            background: #1a2e25;
+            color: #00ff88;
         }
         
         .btn-editar:hover {
-            background: #faf089;
+            background: #0d1a15;
+            border: 1px solid #00ff88;
         }
         
         .btn-eliminar {
-            background: #fed7d7;
-            color: #c53030;
+            background: #ff4444;
+            color: white;
         }
         
         .btn-eliminar:hover {
-            background: #feb2b2;
-        }
-        
-        .mensaje-flotante {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            max-width: 400px;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        .mensaje-success {
-            background: #c6f6d5;
-            color: #22543d;
-            border: 1px solid #9ae6b4;
-        }
-        
-        .mensaje-error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #fc8181;
-        }
-        
-        .sin-resultados {
-            text-align: center;
-            padding: 3rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .sin-resultados .icono {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        
-        .sin-resultados h3 {
-            color: #4a5568;
-            margin-bottom: 0.5rem;
-        }
-        
-        .sin-resultados p {
-            color: #a0aec0;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .equipos-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .equipos-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .filtros-bar {
-                flex-direction: column;
-            }
-            
-            .search-box {
-                min-width: 100%;
-            }
-            
-            .filtro-select {
-                width: 100%;
-            }
+            background: #dd3333;
         }
     </style>
 </head>

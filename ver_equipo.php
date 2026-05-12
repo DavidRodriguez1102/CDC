@@ -102,14 +102,15 @@ foreach ($jugadores as $jugador) {
     <link rel="stylesheet" href="css/admin.css">
     <style>
         .detalle-container {
-            background: white;
+            background: #0d1a15;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #1a2e25;
             overflow: hidden;
         }
         
         .detalle-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a110e 0%, #0d1a15 100%);
+            border-bottom: 2px solid #00ff88;
             color: white;
             padding: 2rem;
         }
@@ -117,11 +118,14 @@ foreach ($jugadores as $jugador) {
         .detalle-header h2 {
             font-size: 2rem;
             margin-bottom: 0.5rem;
+            color: #00ff88;
         }
         
         .detalle-header .id-badge {
             display: inline-block;
-            background: rgba(255,255,255,0.2);
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            color: #00ff88;
             padding: 0.25rem 1rem;
             border-radius: 20px;
             font-size: 0.9rem;
@@ -134,7 +138,7 @@ foreach ($jugadores as $jugador) {
         .info-section {
             margin-bottom: 2rem;
             padding-bottom: 2rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #1a2e25;
         }
         
         .info-section:last-child {
@@ -142,7 +146,7 @@ foreach ($jugadores as $jugador) {
         }
         
         .info-section h3 {
-            color: #2d3748;
+            color: #ffffff;
             margin-bottom: 1rem;
             font-size: 1.3rem;
         }
@@ -155,21 +159,21 @@ foreach ($jugadores as $jugador) {
         }
         
         .stat-box {
-            background: #f7fafc;
+            background: #050a08;
             padding: 1.5rem;
             border-radius: 8px;
             text-align: center;
-            border: 2px solid #e2e8f0;
+            border: 1px solid #1a2e25;
         }
         
         .stat-box .number {
             font-size: 2rem;
             font-weight: bold;
-            color: #2b6cb0;
+            color: #00ff88;
         }
         
         .stat-box .label {
-            color: #718096;
+            color: #cbd5e1;
             font-size: 0.9rem;
             margin-top: 0.25rem;
         }
@@ -181,21 +185,22 @@ foreach ($jugadores as $jugador) {
         }
         
         .jugadores-table th {
-            background: #f7fafc;
+            background: #12241d;
             padding: 1rem;
             text-align: left;
             font-weight: 600;
-            color: #4a5568;
-            border-bottom: 2px solid #e2e8f0;
+            color: #00ff88;
+            border-bottom: 2px solid #1a2e25;
         }
         
         .jugadores-table td {
             padding: 1rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #1a2e25;
+            color: #cbd5e1;
         }
         
         .jugadores-table tr:hover {
-            background: #f7fafc;
+            background: rgba(0, 255, 136, 0.05);
         }
         
         .badge-genero {
@@ -207,19 +212,21 @@ foreach ($jugadores as $jugador) {
         }
         
         .badge-masculino {
-            background: #bee3f8;
-            color: #2b6cb0;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid #00ff88;
         }
         
         .badge-femenino {
-            background: #fed7e2;
-            color: #c53030;
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 1px solid #ff4444;
         }
         
         .sin-jugadores {
             text-align: center;
             padding: 2rem;
-            color: #a0aec0;
+            color: #cbd5e1;
         }
         
         .acciones {
@@ -227,7 +234,7 @@ foreach ($jugadores as $jugador) {
             gap: 1rem;
             margin-top: 2rem;
             padding-top: 2rem;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid #1a2e25;
         }
         
         .btn {
@@ -245,31 +252,34 @@ foreach ($jugadores as $jugador) {
         }
         
         .btn-primary {
-            background: #2b6cb0;
-            color: white;
+            background: #00ff88;
+            color: #050a08;
         }
         
         .btn-primary:hover {
-            background: #2c5282;
+            background: rgba(0, 255, 136, 0.8);
             transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
         }
         
         .btn-secondary {
-            background: #718096;
-            color: white;
+            background: #1a2e25;
+            color: #00ff88;
+            border: 1px solid #1a2e25;
         }
         
         .btn-secondary:hover {
-            background: #4a5568;
+            background: #0d1a15;
+            border-color: #00ff88;
         }
         
         .btn-danger {
-            background: #e53e3e;
+            background: #ff4444;
             color: white;
         }
         
         .btn-danger:hover {
-            background: #c53030;
+            background: #dd3333;
         }
     </style>
 </head>
@@ -373,6 +383,9 @@ foreach ($jugadores as $jugador) {
                                     <tbody>
                                         <?php foreach ($jugadores as $jugador): ?>
                                         <tr>
+                                            <td><span <?php echo $jugador['nombre']; ?>>
+                                                <?php echo ucfirst($jugador['nombre']); ?>
+                                                </span>
                                             <td>
                                                 <span class="badge-genero badge-<?php echo $jugador['genero']; ?>">
                                                     <?php echo ucfirst($jugador['genero']); ?>

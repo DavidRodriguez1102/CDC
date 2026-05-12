@@ -119,9 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
     <link rel="stylesheet" href="css/admin.css">
     <style>
         .form-container {
-            background: white;
+            background: #0d1a15;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #1a2e25;
             padding: 2rem;
             max-width: 800px;
             margin: 0 auto;
@@ -130,22 +130,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
         .form-header {
             margin-bottom: 2rem;
             padding-bottom: 1rem;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 2px solid #1a2e25;
         }
         
         .form-header h2 {
-            color: #2d3748;
+            color: #ffffff;
             margin-bottom: 0.5rem;
         }
         
         .form-header p {
-            color: #718096;
+            color: #94a3b8;
         }
         
         .form-section {
             margin-bottom: 2rem;
             padding-bottom: 2rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #1a2e25;
         }
         
         .form-section:last-of-type {
@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
         }
         
         .form-section h3 {
-            color: #2d3748;
+            color: #ffffff;
             margin-bottom: 1.5rem;
             font-size: 1.2rem;
         }
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #4a5568;
+            color: #94a3b8;
             font-weight: 500;
             font-size: 0.9rem;
         }
@@ -184,22 +184,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
         .form-group select {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #1a2e25;
             border-radius: 8px;
             font-size: 1rem;
+            background: #050a08;
+            color: #ffffff;
             transition: border-color 0.3s;
         }
         
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #2b6cb0;
-            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+            border-color: #00ff88;
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
         }
         
         .form-group small {
             display: block;
-            color: #a0aec0;
+            color: #cbd5e1;
             font-size: 0.85rem;
             margin-top: 0.25rem;
         }
@@ -212,15 +214,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
         }
         
         .mensaje-success {
-            background: #c6f6d5;
-            color: #22543d;
-            border: 1px solid #9ae6b4;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid #00ff88;
         }
         
         .mensaje-error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #fc8181;
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 1px solid #ff4444;
         }
         
         .form-actions {
@@ -228,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
             gap: 1rem;
             margin-top: 2rem;
             padding-top: 2rem;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid #1a2e25;
         }
         
         .btn {
@@ -246,22 +248,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
         }
         
         .btn-primary {
-            background: #2b6cb0;
-            color: white;
+            background: #00ff88;
+            color: #050a08;
         }
         
         .btn-primary:hover {
-            background: #2c5282;
+            background: rgba(0, 255, 136, 0.8);
             transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
         }
         
         .btn-secondary {
-            background: #718096;
-            color: white;
+            background: #1a2e25;
+            color: #00ff88;
+            border: 1px solid #1a2e25;
         }
         
         .btn-secondary:hover {
-            background: #4a5568;
+            background: #0d1a15;
+            border-color: #00ff88;
         }
         
         @media (max-width: 768px) {
@@ -313,7 +318,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
                 <form method="POST" action="">
                     <!-- Datos Generales -->
                     <div class="form-section">
-                        <h3>📋 Datos Generales</h3>
+                        <h3> Datos Generales</h3>
                         <div class="form-grid">
                             <div class="form-group full-width">
                                 <label for="nombre">Nombre Oficial *</label>
@@ -338,7 +343,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
                     
                     <!-- Dirección -->
                     <div class="form-section">
-                        <h3>📍 Dirección</h3>
+                        <h3> Dirección</h3>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="departamento">Departamento *</label>

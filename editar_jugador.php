@@ -71,18 +71,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
         $tipo_mensaje = 'error';
     } else {
         // Verificar si ya existe otro jugador con exactamente la misma información
-        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM jugadores WHERE nombre = :nombre AND fecha_nacimiento = :fecha_nacimiento AND genero = :genero AND equipo_id = :equipo_id AND activo = 1 AND id != :id");
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM jugadores WHERE nombre = :nombre AND fecha_nacimiento = :fecha_nacimiento AND genero = :genero AND activo = 1 AND id != :id");
         $stmtCheck->execute([
             ':nombre' => $nombre,
             ':fecha_nacimiento' => $fecha_nacimiento,
             ':genero' => $genero,
-            ':equipo_id' => $equipo_id,
             ':id' => $id
         ]);
         $existe = $stmtCheck->fetchColumn();
         
         if ($existe > 0) {
-            $mensaje = 'Ya existe otro jugador con exactamente la misma información (nombre, fecha de nacimiento, género y equipo).';
+            $mensaje = 'Ya existe otro jugador con exactamente la misma información (nombre, fecha de nacimiento y género). No se puede registrar el mismo jugador en equipos diferentes.';
             $tipo_mensaje = 'error';
         } else {
             try {
@@ -129,9 +128,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
     <link rel="stylesheet" href="css/admin.css">
     <style>
         .form-container {
-            background: white;
+            background: #0d1a15;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #1a2e25;
             padding: 2rem;
             max-width: 800px;
             margin: 0 auto;
@@ -140,16 +139,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
         .form-header {
             margin-bottom: 2rem;
             padding-bottom: 1rem;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 2px solid #1a2e25;
         }
         
         .form-header h2 {
-            color: #2d3748;
+            color: #ffffff;
             margin-bottom: 0.5rem;
         }
         
         .form-header p {
-            color: #718096;
+            color: #94a3b8;
         }
         
         .form-grid {
@@ -169,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #4a5568;
+            color: #94a3b8;
             font-weight: 500;
             font-size: 0.9rem;
         }
@@ -178,17 +177,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
         .form-group select {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #1a2e25;
             border-radius: 8px;
             font-size: 1rem;
+            background: #050a08;
+            color: #ffffff;
             transition: border-color 0.3s;
         }
         
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #2b6cb0;
-            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+            border-color: #00ff88;
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
         }
         
         .mensaje {
@@ -199,15 +200,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
         }
         
         .mensaje-success {
-            background: #c6f6d5;
-            color: #22543d;
-            border: 1px solid #9ae6b4;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid #00ff88;
         }
         
         .mensaje-error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #fc8181;
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 1px solid #ff4444;
         }
         
         .form-actions {
@@ -215,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
             gap: 1rem;
             margin-top: 2rem;
             padding-top: 2rem;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid #1a2e25;
         }
         
         .btn {
@@ -233,22 +234,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
         }
         
         .btn-primary {
-            background: #2b6cb0;
-            color: white;
+            background: #00ff88;
+            color: #050a08;
         }
         
         .btn-primary:hover {
-            background: #2c5282;
+            background: rgba(0, 255, 136, 0.8);
             transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
         }
         
         .btn-secondary {
-            background: #718096;
-            color: white;
+            background: #1a2e25;
+            color: #00ff88;
+            border: 1px solid #1a2e25;
         }
         
         .btn-secondary:hover {
-            background: #4a5568;
+            background: #0d1a15;
+            border-color: #00ff88;
         }
         
         @media (max-width: 768px) {

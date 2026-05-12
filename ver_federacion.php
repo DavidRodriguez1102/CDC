@@ -107,14 +107,15 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
     <link rel="stylesheet" href="css/admin.css">
     <style>
         .detalle-container {
-            background: white;
+            background: #0d1a15;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #1a2e25;
             overflow: hidden;
         }
         
         .detalle-header {
-            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            background: linear-gradient(135deg, #0a110e 0%, #0d1a15 100%);
+            border-bottom: 2px solid #00ff88;
             color: white;
             padding: 2rem;
         }
@@ -122,11 +123,14 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
         .detalle-header h2 {
             font-size: 2rem;
             margin-bottom: 0.5rem;
+            color: #00ff88;
         }
         
         .detalle-header .badge {
             display: inline-block;
-            background: rgba(255,255,255,0.2);
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            color: #00ff88;
             padding: 0.25rem 1rem;
             border-radius: 20px;
             font-size: 0.9rem;
@@ -139,7 +143,7 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
         .info-section {
             margin-bottom: 2rem;
             padding-bottom: 2rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #1a2e25;
         }
         
         .info-section:last-child {
@@ -147,7 +151,7 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
         }
         
         .info-section h3 {
-            color: #2d3748;
+            color: #ffffff;
             margin-bottom: 1rem;
             font-size: 1.3rem;
         }
@@ -159,14 +163,14 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
         }
         
         .info-item {
-            background: #f7fafc;
+            background: #050a08;
             padding: 1.5rem;
             border-radius: 8px;
-            border-left: 4px solid #2b6cb0;
+            border-left: 4px solid #00ff88;
         }
         
         .info-item label {
-            color: #4a5568;
+            color: #94a3b8;
             font-size: 0.85rem;
             text-transform: uppercase;
             display: block;
@@ -174,7 +178,7 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
         }
         
         .info-item p {
-            color: #2d3748;
+            color: #ffffff;
             font-size: 1.1rem;
             font-weight: 500;
         }
@@ -187,8 +191,9 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
         }
         
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #050a08;
+            border: 1px solid #1a2e25;
+            color: #00ff88;
             padding: 1.5rem;
             border-radius: 8px;
             text-align: center;
@@ -203,6 +208,7 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
             font-size: 0.9rem;
             opacity: 0.9;
             margin-top: 0.25rem;
+            color: #cbd5e1;
         }
         
         .equipos-grid {
@@ -212,45 +218,50 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
         }
         
         .equipo-mini-card {
-            background: #f7fafc;
+            background: #050a08;
             padding: 1.5rem;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #1a2e25;
             transition: all 0.3s;
         }
         
         .equipo-mini-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.05);
             transform: translateY(-2px);
         }
         
         .equipo-mini-card h4 {
-            color: #2d3748;
+            color: #00ff88;
             margin-bottom: 0.5rem;
         }
         
         .equipo-mini-card p {
-            color: #718096;
+            color: #cbd5e1;
             font-size: 0.9rem;
         }
         
         .ver-mas {
             display: inline-block;
             margin-top: 0.5rem;
-            color: #2b6cb0;
+            color: #00ff88;
             text-decoration: none;
             font-weight: 500;
             font-size: 0.9rem;
+            border: 1px solid #00ff88;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s;
         }
         
         .ver-mas:hover {
-            text-decoration: underline;
+            background: rgba(0, 255, 136, 0.1);
         }
         
         .sin-datos {
             text-align: center;
             padding: 2rem;
-            color: #a0aec0;
+            color: #cbd5e1;
         }
         
         .acciones {
@@ -258,7 +269,7 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
             gap: 1rem;
             margin-top: 2rem;
             padding-top: 2rem;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid #1a2e25;
             flex-wrap: wrap;
         }
         
@@ -277,31 +288,34 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
         }
         
         .btn-primary {
-            background: #2b6cb0;
-            color: white;
+            background: #00ff88;
+            color: #050a08;
         }
         
         .btn-primary:hover {
-            background: #2c5282;
+            background: rgba(0, 255, 136, 0.8);
             transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
         }
         
         .btn-secondary {
-            background: #718096;
-            color: white;
+            background: #1a2e25;
+            color: #00ff88;
+            border: 1px solid #1a2e25;
         }
         
         .btn-secondary:hover {
-            background: #4a5568;
+            background: #0d1a15;
+            border-color: #00ff88;
         }
         
         .btn-danger {
-            background: #e53e3e;
+            background: #ff4444;
             color: white;
         }
         
         .btn-danger:hover {
-            background: #c53030;
+            background: #dd3333;
         }
     </style>
 </head>

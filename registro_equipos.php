@@ -17,13 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $mensaje = 'El nombre y la federación son obligatorios';
         $tipo_mensaje = 'error';
     } else {
-        // Verificar si ya existe un equipo con el mismo nombre en la misma federación
-        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE nombre = :nombre AND federacion_id = :federacion_id AND activo = 1");
-        $stmtCheck->execute([':nombre' => $nombre, ':federacion_id' => $federacion_id]);
+        // Verificar si ya existe un equipo con el mismo nombre (en cualquier federación)
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE nombre = :nombre AND activo = 1");
+        $stmtCheck->execute([':nombre' => $nombre]);
         $existe = $stmtCheck->fetchColumn();
         
         if ($existe > 0) {
-            $mensaje = 'Ya existe un equipo con este nombre en la federación seleccionada';
+            $mensaje = 'Ya existe un equipo con este nombre. No se puede registrar el mismo equipo en diferentes federaciones';
             $tipo_mensaje = 'error';
         } else {
             try {
@@ -95,12 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>ID del Equipo</label>
-                        <input type="text" name="id_equipo" placeholder="FTBL-2024-089" 
-                               value="FTBL-<?php echo date('Y'); ?>-<?php echo rand(100, 999); ?>">
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Registrar Equipo</button>

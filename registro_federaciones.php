@@ -90,13 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <h3>Datos generales</h3>
                     
                     <div class="form-group">
-                        <label>ID de Federación *</label>
-                        <input type="text" name="id_federacion" placeholder="FED-2024-001" 
-                               value="FED-<?php echo date('Y'); ?>-<?php echo rand(100, 999); ?>">
-                        <small>El ID se genera automáticamente o ingrese el asignado.</small>
-                    </div>
-                    
-                    <div class="form-group">
                         <label>Nombre Oficial *</label>
                         <input type="text" name="nombre" placeholder="Federación Deportiva de..." required>
                     </div>

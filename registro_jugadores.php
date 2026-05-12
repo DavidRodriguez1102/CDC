@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar_jugador'])) 
     $genero = $_POST['genero'];
     $equipo_id = filter_var($_POST['equipo_id'], FILTER_VALIDATE_INT);
 
-    // Validaciones simples pero robustas
+    // Validaciones 
     if (empty($nombre) || empty($id_jugador) || empty($fecha_nacimiento) || empty($genero) || !$equipo_id) {
         $mensaje = 'Todos los campos son obligatorios.';
         $tipo_mensaje = 'error';
@@ -99,12 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar_jugador'])) 
                         <label>Nombre Completo *</label>
                         <input type="text" name="nombre" placeholder="Ej: Juan Pérez García" required>
                     </div>
-
-                    <div class="form-group">
-                        <label>ID del Jugador (Documento) *</label>
-                        <input type="text" name="id_jugador" placeholder="Ej: 12549" required>
-                    </div>
-                    
+                                        
                     <div class="form-group">
                         <label>Fecha de Nacimiento *</label>
                         <input type="date" name="fecha_nacimiento" required>

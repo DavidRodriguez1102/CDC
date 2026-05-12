@@ -21,13 +21,15 @@ if (isset($_SESSION['usuario_id'])) {
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a110e 0%, #0d1a15 100%);
             min-height: 100vh;
+            color: #ffffff;
         }
         
         .navbar {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 255, 136, 0.05);
             backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
             padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
@@ -41,7 +43,7 @@ if (isset($_SESSION['usuario_id'])) {
         .navbar .logo {
             font-size: 1.5rem;
             font-weight: bold;
-            color: white;
+            color: #00ff88;
         }
         
         .nav-links {
@@ -51,19 +53,19 @@ if (isset($_SESSION['usuario_id'])) {
         }
         
         .nav-links a {
-            color: white;
+            color: #cbd5e1;
             text-decoration: none;
             font-weight: 500;
-            transition: opacity 0.3s;
+            transition: color 0.3s;
         }
         
         .nav-links a:hover {
-            opacity: 0.8;
+            color: #00ff88;
         }
         
         .btn-login {
-            background: white;
-            color: #667eea !important;
+            background: #00ff88;
+            color: #050a08 !important;
             padding: 0.5rem 1.5rem;
             border-radius: 25px;
             font-weight: bold !important;
@@ -84,6 +86,7 @@ if (isset($_SESSION['usuario_id'])) {
             font-size: 3.5rem;
             margin-bottom: 1rem;
             animation: fadeInUp 1s ease;
+            color: #00ff88;
         }
         
         .hero p {
@@ -91,6 +94,7 @@ if (isset($_SESSION['usuario_id'])) {
             margin-bottom: 2rem;
             opacity: 0.9;
             animation: fadeInUp 1s ease 0.2s both;
+            color: #cbd5e1;
         }
         
         .hero-buttons {
@@ -110,17 +114,17 @@ if (isset($_SESSION['usuario_id'])) {
         
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
         }
         
         .btn-primary {
-            background: white;
-            color: #667eea;
+            background: #00ff88;
+            color: #050a08;
         }
         
         .btn-secondary {
-            border: 2px solid white;
-            color: white;
+            border: 2px solid #00ff88;
+            color: #00ff88;
         }
         
         .features {
@@ -128,17 +132,20 @@ if (isset($_SESSION['usuario_id'])) {
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
             padding: 4rem 5%;
-            background: white;
+            background: #0d1a15;
+            border-top: 1px solid #1a2e25;
         }
         
         .feature-card {
             text-align: center;
             padding: 2rem;
+            color: #cbd5e1;
         }
         
         .feature-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
+            color: #00ff88;
         }
         
         @keyframes fadeInUp {
