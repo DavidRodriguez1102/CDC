@@ -22,6 +22,22 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+// Manejar eliminación directa desde este mismo archivo
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['equipo_id'])) {
+    $equipo_id = filter_var($_POST['equipo_id'], FILTER_VALIDATE_INT);
+    if ($equipo_id) {
+        $pdo->beginTransaction();
+        $stmtDeleteJugadores = $pdo->prepare("UPDATE jugadores SET activo = 0 WHERE equipo_id = :id");
+        $stmtDeleteJugadores->execute([':id' => $equipo_id]);
+
+        $stmtDeleteEquipo = $pdo->prepare("UPDATE equipos SET activo = 0 WHERE id = :id");
+        $stmtDeleteEquipo->execute([':id' => $equipo_id]);
+        $pdo->commit();
+    }
+    header('Location: equipos.php');
+    exit;
+}
+
 // Obtener ID del equipo
 $id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_VALIDATE_INT) : 0;
 
@@ -379,7 +395,7 @@ foreach ($jugadores as $jugador) {
                         <a href="equipos.php" class="btn btn-secondary">
                              Volver a la lista
                         </a>
-                        <form method="POST" action="eliminar_equipo.php" style="display: inline;" 
+                        <form method="POST" action="ver_equipo.php?id=<?php echo $equipo['id']; ?>" style="display: inline;" 
                               onsubmit="return confirm('¿Estás seguro de eliminar el equipo <?php echo htmlspecialchars(addslashes($equipo['nombre'])); ?>?')">
                             <input type="hidden" name="equipo_id" value="<?php echo $equipo['id']; ?>">
                             <button type="submit" class="btn btn-danger">

@@ -22,6 +22,17 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+// Manejar eliminación directa desde este mismo archivo
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['jugador_id'])) {
+    $jugador_id = filter_var($_POST['jugador_id'], FILTER_VALIDATE_INT);
+    if ($jugador_id) {
+        $stmtDelete = $pdo->prepare("UPDATE jugadores SET activo = 0 WHERE id = :id");
+        $stmtDelete->execute([':id' => $jugador_id]);
+    }
+    header('Location: jugadores.php');
+    exit;
+}
+
 // Obtener ID del jugador
 $id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_VALIDATE_INT) : 0;
 
@@ -294,7 +305,7 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
                         <a href="jugadores.php" class="btn btn-secondary">
                              Volver a la lista
                         </a>
-                        <form method="POST" action="eliminar_jugador.php" style="display: inline;" 
+                        <form method="POST" action="ver_jugador.php?id=<?php echo $jugador['id']; ?>" style="display: inline;" 
                               onsubmit="return confirm('¿Estás seguro de eliminar a <?php echo htmlspecialchars(addslashes($jugador['nombre'])); ?>?')">
                             <input type="hidden" name="jugador_id" value="<?php echo $jugador['id']; ?>">
                             <button type="submit" class="btn btn-danger">
