@@ -22,23 +22,39 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+$error_mensaje = '';
+
 // Manejar eliminación directa desde este mismo archivo
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['federacion_id'])) {
     $federacion_id = filter_var($_POST['federacion_id'], FILTER_VALIDATE_INT);
     if ($federacion_id) {
-        $pdo->beginTransaction();
-        $stmtDeleteJugadores = $pdo->prepare("UPDATE jugadores SET activo = 0 WHERE equipo_id IN (SELECT id FROM equipos WHERE federacion_id = :id)");
-        $stmtDeleteJugadores->execute([':id' => $federacion_id]);
+        try {
+            $stmtEquipos = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE federacion_id = :id AND activo = 1");
+            $stmtEquipos->execute([':id' => $federacion_id]);
+            $total_equipos = $stmtEquipos->fetchColumn();
 
-        $stmtDeleteEquipos = $pdo->prepare("UPDATE equipos SET activo = 0 WHERE federacion_id = :id");
-        $stmtDeleteEquipos->execute([':id' => $federacion_id]);
+            $stmtJugadores = $pdo->prepare(
+                "SELECT COUNT(*) FROM jugadores j 
+                 JOIN equipos e ON j.equipo_id = e.id 
+                 WHERE e.federacion_id = :id AND j.activo = 1"
+            );
+            $stmtJugadores->execute([':id' => $federacion_id]);
+            $total_jugadores = $stmtJugadores->fetchColumn();
 
-        $stmtDeleteFederacion = $pdo->prepare("UPDATE federaciones SET activo = 0 WHERE id = :id");
-        $stmtDeleteFederacion->execute([':id' => $federacion_id]);
-        $pdo->commit();
+            if ($total_equipos > 0) {
+                $error_mensaje = "No se puede eliminar la federación porque tiene $total_equipos equipos activos asignados.";
+            } elseif ($total_jugadores > 0) {
+                $error_mensaje = "No se puede eliminar la federación porque sus equipos tienen $total_jugadores jugadores activos asignados.";
+            } else {
+                $stmtDeleteFederacion = $pdo->prepare("UPDATE federaciones SET activo = 0 WHERE id = :id");
+                $stmtDeleteFederacion->execute([':id' => $federacion_id]);
+                header('Location: federaciones.php');
+                exit;
+            }
+        } catch (PDOException $e) {
+            $error_mensaje = "Error al eliminar la federación: " . $e->getMessage();
+        }
     }
-    header('Location: federaciones.php');
-    exit;
 }
 
 // Obtener ID de la federación
@@ -314,6 +330,12 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
                 <a href="federaciones.php" class="btn btn-secondary"> Volver a Federaciones</a>
             </header>
             
+            <?php if (!empty($error_mensaje)): ?>
+                <div style="margin: 1rem 0; padding: 1rem; border-radius: 8px; background: #fff5f5; color: #742a2a; border: 1px solid #feb2b2;">
+                    <?php echo htmlspecialchars($error_mensaje); ?>
+                </div>
+            <?php endif; ?>
+
             <div class="detalle-container">
                 <div class="detalle-header">
                     <h2><?php echo htmlspecialchars($federacion['nombre']); ?></h2>

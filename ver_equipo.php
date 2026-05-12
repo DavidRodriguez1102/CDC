@@ -22,20 +22,29 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+$error_mensaje = '';
+
 // Manejar eliminación directa desde este mismo archivo
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['equipo_id'])) {
     $equipo_id = filter_var($_POST['equipo_id'], FILTER_VALIDATE_INT);
     if ($equipo_id) {
-        $pdo->beginTransaction();
-        $stmtDeleteJugadores = $pdo->prepare("UPDATE jugadores SET activo = 0 WHERE equipo_id = :id");
-        $stmtDeleteJugadores->execute([':id' => $equipo_id]);
+        try {
+            $stmtJugadoresCount = $pdo->prepare("SELECT COUNT(*) FROM jugadores WHERE equipo_id = :id AND activo = 1");
+            $stmtJugadoresCount->execute([':id' => $equipo_id]);
+            $total_jugadores = $stmtJugadoresCount->fetchColumn();
 
-        $stmtDeleteEquipo = $pdo->prepare("UPDATE equipos SET activo = 0 WHERE id = :id");
-        $stmtDeleteEquipo->execute([':id' => $equipo_id]);
-        $pdo->commit();
+            if ($total_jugadores > 0) {
+                $error_mensaje = "No se puede eliminar el equipo porque tiene $total_jugadores jugadores activos asignados.";
+            } else {
+                $stmtDeleteEquipo = $pdo->prepare("UPDATE equipos SET activo = 0 WHERE id = :id");
+                $stmtDeleteEquipo->execute([':id' => $equipo_id]);
+                header('Location: equipos.php');
+                exit;
+            }
+        } catch (PDOException $e) {
+            $error_mensaje = "Error al eliminar el equipo: " . $e->getMessage();
+        }
     }
-    header('Location: equipos.php');
-    exit;
 }
 
 // Obtener ID del equipo
@@ -288,6 +297,12 @@ foreach ($jugadores as $jugador) {
                 <h2>Detalles del Equipo</h2>
                 <a href="equipos.php" class="btn btn-secondary"> Volver a Equipos</a>
             </header>
+
+            <?php if (!empty($error_mensaje)): ?>
+                <div style="margin: 1rem 0; padding: 1rem; border-radius: 8px; background: #fff5f5; color: #742a2a; border: 1px solid #feb2b2;">
+                    <?php echo htmlspecialchars($error_mensaje); ?>
+                </div>
+            <?php endif; ?>
             
             <div class="detalle-container">
                 <div class="detalle-header">

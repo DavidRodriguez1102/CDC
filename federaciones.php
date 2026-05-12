@@ -2,6 +2,40 @@
 require_once 'includes/conexion.php';
 verificarAutenticacion();
 
+$error_mensaje = '';
+
+if (isset($_POST['eliminar_federacion']) && isset($_POST['federacion_id'])) {
+    $federacion_id = filter_var($_POST['federacion_id'], FILTER_VALIDATE_INT);
+    if ($federacion_id) {
+        try {
+            $stmtEquipos = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE federacion_id = :id AND activo = 1");
+            $stmtEquipos->execute([':id' => $federacion_id]);
+            $total_equipos = $stmtEquipos->fetchColumn();
+
+            $stmtJugadores = $pdo->prepare(
+                "SELECT COUNT(*) FROM jugadores j 
+                 JOIN equipos e ON j.equipo_id = e.id 
+                 WHERE e.federacion_id = :id AND j.activo = 1"
+            );
+            $stmtJugadores->execute([':id' => $federacion_id]);
+            $total_jugadores = $stmtJugadores->fetchColumn();
+
+            if ($total_equipos > 0) {
+                $error_mensaje = "No se puede eliminar la federación porque tiene $total_equipos equipos activos asignados.";
+            } elseif ($total_jugadores > 0) {
+                $error_mensaje = "No se puede eliminar la federación porque sus equipos tienen $total_jugadores jugadores activos asignados.";
+            } else {
+                $stmtDeleteFederacion = $pdo->prepare("UPDATE federaciones SET activo = 0 WHERE id = :id");
+                $stmtDeleteFederacion->execute([':id' => $federacion_id]);
+                header('Location: federaciones.php');
+                exit;
+            }
+        } catch (PDOException $e) {
+            $error_mensaje = "Error al eliminar la federación: " . $e->getMessage();
+        }
+    }
+}
+
 $busqueda = isset($_GET['buscar']) ? limpiarInput($_GET['buscar']) : '';
 
 $sql = "SELECT * FROM federaciones WHERE activo = 1";
@@ -49,6 +83,12 @@ $federaciones = $stmt->fetchAll();
                 <a href="registro_federaciones.php" class="btn btn-primary">+ Nueva Federación</a>
             </header>
             
+            <?php if (!empty($error_mensaje)): ?>
+                <div style="margin: 1rem 0; padding: 1rem; border-radius: 8px; background: #fff5f5; color: #742a2a; border: 1px solid #feb2b2;">
+                    <?php echo htmlspecialchars($error_mensaje); ?>
+                </div>
+            <?php endif; ?>
+
             <div class="search-box">
                 <form method="GET" action="">
                     <input type="text" name="buscar" placeholder="Buscar federación por nombre o ID..." 
@@ -82,9 +122,11 @@ $federaciones = $stmt->fetchAll();
                                        class="btn btn-primary" style="padding: 0.5rem;"> Ver</a>
                                     <a href="editar_federacion.php?id=<?php echo $federacion['id']; ?>" 
                                        class="btn btn-secondary" style="padding: 0.5rem;"> Editar</a>
-                                    <a href="eliminar_federacion.php?id=<?php echo $federacion['id']; ?>" 
-                                       class="btn btn-danger" style="padding: 0.5rem;" 
-                                       onclick="return confirm('¿Estás seguro de eliminar esta federación?')"> Eliminar</a>
+                                    <form method="POST" action="" style="display:inline;">
+                                        <input type="hidden" name="federacion_id" value="<?php echo $federacion['id']; ?>">
+                                        <button type="submit" name="eliminar_federacion" class="btn btn-danger" style="padding: 0.5rem;" 
+                                                onclick="return confirm('¿Estás seguro de eliminar esta federación?')">Eliminar</button>
+                                    </form>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
