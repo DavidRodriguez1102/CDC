@@ -4,24 +4,33 @@ verificarAutenticacion();
 
 $mensaje = '';
 $tipo_mensaje = ''; // 'success' o 'error'
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 
 // Obtener todos los equipos para el selector <select>
-$stmtEquipos = $pdo->query("SELECT id, nombre FROM equipos WHERE activo = 1 ORDER BY nombre");
+if ($rol === 'admin' && $federacion_id) {
+    $stmtEquipos = $pdo->prepare("SELECT id, nombre FROM equipos WHERE activo = 1 AND federacion_id = :federacion_id ORDER BY nombre");
+    $stmtEquipos->execute([':federacion_id' => $federacion_id]);
+} else {
+    $stmtEquipos = $pdo->query("SELECT id, nombre FROM equipos WHERE activo = 1 ORDER BY nombre");
+}
 $equipos = $stmtEquipos->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar_jugador'])) {
     $nombre = limpiarInput($_POST['nombre']);
-    $id_jugador = limpiarInput($_POST['id_jugador']);
     $fecha_nacimiento = $_POST['fecha_nacimiento'];
     $genero = $_POST['genero'];
     $equipo_id = filter_var($_POST['equipo_id'], FILTER_VALIDATE_INT);
 
     // Validaciones 
-    if (empty($nombre) || empty($id_jugador) || empty($fecha_nacimiento) || empty($genero) || !$equipo_id) {
+    if (empty($nombre) || empty($fecha_nacimiento) || empty($genero) || !$equipo_id) {
         $mensaje = 'Todos los campos son obligatorios.';
         $tipo_mensaje = 'error';
     } elseif (!in_array($genero, ['masculino', 'femenino'])) {
         $mensaje = 'Género no válido.';
+        $tipo_mensaje = 'error';
+    } elseif ($fecha_nacimiento > date('Y-m-d')) {
+        $mensaje = 'La fecha de nacimiento no puede ser futura.';
         $tipo_mensaje = 'error';
     } else {
         // Verificar si ya existe un jugador con exactamente la misma información
@@ -73,7 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar_jugador'])) 
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php" class="active"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>

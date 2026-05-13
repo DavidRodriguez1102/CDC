@@ -4,6 +4,8 @@ verificarAutenticacion();
 
 $mensaje = '';
 $tipo_mensaje = '';
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 
 // Actualizar información personal
 if (isset($_POST['actualizar_info'])) {
@@ -67,7 +69,9 @@ if (isset($_POST['cambiar_password'])) {
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>
@@ -94,7 +98,7 @@ if (isset($_POST['cambiar_password'])) {
                 <form method="POST" action="">
                     <h4>Información Personal</h4>
                     <div class="form-group">
-                        <label>Nombre Completo</label>
+                        <label>Rol</label>
                         <input type="text" name="nombre_completo" 
                                value="<?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?>" required>
                     </div>

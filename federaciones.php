@@ -8,29 +8,32 @@ if (isset($_POST['eliminar_federacion']) && isset($_POST['federacion_id'])) {
     $federacion_id = filter_var($_POST['federacion_id'], FILTER_VALIDATE_INT);
     if ($federacion_id) {
         try {
-            $stmtEquipos = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE federacion_id = :id AND activo = 1");
+            // Iniciar transacción para garantizar consistencia
+            $pdo->beginTransaction();
+            
+            // 1. Obtener todos los equipos de la federación
+            $stmtEquipos = $pdo->prepare("SELECT id FROM equipos WHERE federacion_id = :id AND activo = 1");
             $stmtEquipos->execute([':id' => $federacion_id]);
-            $total_equipos = $stmtEquipos->fetchColumn();
+            $equipos = $stmtEquipos->fetchAll();
 
-            $stmtJugadores = $pdo->prepare(
-                "SELECT COUNT(*) FROM jugadores j 
-                 JOIN equipos e ON j.equipo_id = e.id 
-                 WHERE e.federacion_id = :id AND j.activo = 1"
-            );
-            $stmtJugadores->execute([':id' => $federacion_id]);
-            $total_jugadores = $stmtJugadores->fetchColumn();
-
-            if ($total_equipos > 0) {
-                $error_mensaje = "No se puede eliminar la federación porque tiene $total_equipos equipos activos asignados.";
-            } elseif ($total_jugadores > 0) {
-                $error_mensaje = "No se puede eliminar la federación porque sus equipos tienen $total_jugadores jugadores activos asignados.";
-            } else {
-                $stmtDeleteFederacion = $pdo->prepare("UPDATE federaciones SET activo = 0 WHERE id = :id");
-                $stmtDeleteFederacion->execute([':id' => $federacion_id]);
-                header('Location: federaciones.php');
-                exit;
-            }
+            
+            // 2. Eliminar el usuario admin de la federación (si existe)
+            $stmtDesactivarUsuario = $pdo->prepare("DELETE FROM usuarios WHERE federacion_id = :id AND rol = 'admin'");
+            $stmtDesactivarUsuario->execute([':id' => $federacion_id]);
+            
+            // 3. Eliminar la federación
+            $stmtDesactivarFederacion = $pdo->prepare("DELETE FROM federaciones WHERE id = :id");
+            $stmtDesactivarFederacion->execute([':id' => $federacion_id]);
+            
+            // Confirmar la transacción
+            $pdo->commit();
+            
+            $success_mensaje = "Federación y todos sus datos asociados (usuario) han sido eliminados correctamente.";
+            header('Location: federaciones.php');
+            exit;
         } catch (PDOException $e) {
+            // Revertir la transacción en caso de error
+            $pdo->rollBack();
             $error_mensaje = "Error al eliminar la federación: " . $e->getMessage();
         }
     }
@@ -125,7 +128,7 @@ $federaciones = $stmt->fetchAll();
                                     <form method="POST" action="" style="display:inline;">
                                         <input type="hidden" name="federacion_id" value="<?php echo $federacion['id']; ?>">
                                         <button type="submit" name="eliminar_federacion" class="btn btn-danger" style="padding: 0.5rem;" 
-                                                onclick="return confirm('¿Estás seguro de eliminar esta federación?')">Eliminar</button>
+                                                onclick="return confirm('ADVERTENCIA: ¿Estás seguro de eliminar esta federación? Esto eliminará también:• Todos los equipos asociados• Todos los jugadores de esos equipos• El usuario administradorEsta acción NO se puede deshacer.')">Eliminar</button>
                                     </form>
                                 </td>
                             </tr>

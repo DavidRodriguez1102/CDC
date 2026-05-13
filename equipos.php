@@ -2,6 +2,9 @@
 require_once __DIR__ . '/includes/conexion.php';
 verificarAutenticacion();
 
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
+
 // Manejar eliminación de equipo
 if (isset($_POST['eliminar_equipo']) && isset($_POST['equipo_id'])) {
     $equipo_id = filter_var($_POST['equipo_id'], FILTER_VALIDATE_INT);
@@ -16,8 +19,8 @@ if (isset($_POST['eliminar_equipo']) && isset($_POST['equipo_id'])) {
             if ($total_jugadores > 0) {
                 $error_mensaje = "No se puede eliminar el equipo porque tiene $total_jugadores jugadores activos.";
             } else {
-                // Soft delete (desactivar)
-                $stmt = $pdo->prepare("UPDATE equipos SET activo = 0 WHERE id = :equipo_id");
+                // Eliminar equipo
+                $stmt = $pdo->prepare("DELETE FROM equipos WHERE id = :equipo_id");
                 $stmt->execute([':equipo_id' => $equipo_id]);
                 $success_mensaje = "Equipo eliminado correctamente.";
             }
@@ -29,7 +32,12 @@ if (isset($_POST['eliminar_equipo']) && isset($_POST['equipo_id'])) {
 
 // Parámetros de búsqueda y filtro
 $busqueda = isset($_GET['buscar']) ? limpiarInput($_GET['buscar']) : '';
-$federacion_filtro = isset($_GET['federacion_id']) ? filter_var($_GET['federacion_id'], FILTER_VALIDATE_INT) : 0;
+$federacion_filtro = 0;
+
+// Para super_admin, permitir filtro de federación por URL
+if ($rol === 'super_admin') {
+    $federacion_filtro = isset($_GET['federacion_id']) ? filter_var($_GET['federacion_id'], FILTER_VALIDATE_INT) : 0;
+}
 
 // Construir consulta SQL base
 $sql = "SELECT e.*, f.nombre as nombre_federacion,
@@ -39,6 +47,12 @@ $sql = "SELECT e.*, f.nombre as nombre_federacion,
         WHERE e.activo = 1";
 
 $params = [];
+
+// Si es admin, solo ve equipos de su federación
+if ($rol === 'admin' && $federacion_id) {
+    $sql .= " AND e.federacion_id = :federacion_id";
+    $params[':federacion_id'] = $federacion_id;
+}
 
 // Agregar condiciones de búsqueda
 if ($busqueda) {
@@ -61,7 +75,15 @@ $equipos = $stmt->fetchAll();
 
 // Obtener total de equipos para estadísticas
 $total_equipos = count($equipos);
-$total_jugadores_global = $pdo->query("SELECT COUNT(*) FROM jugadores WHERE activo = 1")->fetchColumn();
+
+// Obtener total de jugadores para estadísticas (filtrado por federación si es admin)
+if ($rol === 'admin' && $federacion_id) {
+    $total_jugadores_global = $pdo->prepare("SELECT COUNT(*) FROM jugadores j LEFT JOIN equipos e ON j.equipo_id = e.id WHERE j.activo = 1 AND e.federacion_id = :federacion_id");
+    $total_jugadores_global->execute([':federacion_id' => $federacion_id]);
+    $total_jugadores_global = $total_jugadores_global->fetchColumn();
+} else {
+    $total_jugadores_global = $pdo->query("SELECT COUNT(*) FROM jugadores WHERE activo = 1")->fetchColumn();
+}
 
 // Obtener federaciones para el filtro
 $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 1 ORDER BY nombre")->fetchAll();
@@ -195,7 +217,9 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php" class="active"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>
@@ -231,11 +255,11 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
                 <div class="equipos-stats">
                     <div class="stat-mini">
                         <div class="number"><?php echo $total_equipos; ?></div>
-                        <div class="label">Equipos</div>
+                        <div class="label">Equipos<?php echo $rol === 'admin' ? ' en mi Federación' : ''; ?></div>
                     </div>
                     <div class="stat-mini">
                         <div class="number"><?php echo $total_jugadores_global; ?></div>
-                        <div class="label">Jugadores Totales</div>
+                        <div class="label">Jugadores<?php echo $rol === 'admin' ? ' en mi Federación' : ' Totales'; ?></div>
                     </div>
                 </div>
                 
@@ -247,12 +271,13 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
             <!-- Filtros -->
             <div class="filtros-bar">
                 <div class="search-box">
-<form method="GET" action="equipos.php" style="display: flex; gap: 0.5rem;">
+                <form method="GET" action="equipos.php" style="display: flex; gap: 0.5rem;">
                         <input type="text" 
                                name="buscar" 
                                placeholder=" Buscar equipos por nombre o ID de federacion..." 
                                value="<?php echo htmlspecialchars($busqueda); ?>">
                         
+                        <?php if ($rol !== 'admin'): ?>
                         <select name="federacion_id" class="filtro-select" onchange="this.form.submit()">
                             <option value="">Todas las Federaciones</option>
                             <?php foreach ($federaciones as $federacion): ?>
@@ -262,6 +287,7 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <?php endif; ?>
                         
                         <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
                             Buscar
@@ -284,7 +310,7 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
                                     <?php echo htmlspecialchars($equipo['nombre']); ?>
                                 </h3>
                                 <span class="equipo-badge">
-                                    ID: <?php echo $equipo['federacion_id']; ?>
+                                    ID de la federación: <?php echo $equipo['federacion_id']; ?>
                                 </span>
                             </div>
                             

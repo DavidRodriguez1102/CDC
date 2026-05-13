@@ -2,17 +2,31 @@
 require_once 'includes/conexion.php';
 verificarAutenticacion();
 
-// Obtener federaciones para el select
-$federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 1 ORDER BY nombre")->fetchAll();
-
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 $mensaje = '';
 $tipo_mensaje = '';
 
+// Obtener federaciones para el select
+if ($rol === 'admin' && $federacion_id) {
+    $federaciones = $pdo->prepare("SELECT id, nombre FROM federaciones WHERE id = :id AND activo = 1");
+    $federaciones->execute([':id' => $federacion_id]);
+    $federaciones = $federaciones->fetchAll();
+} else {
+    $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 1 ORDER BY nombre")->fetchAll();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre = limpiarInput($_POST['nombre']);
-    $federacion_id = filter_var($_POST['federacion_id'], FILTER_VALIDATE_INT);
-    $id_equipo = limpiarInput($_POST['id_equipo']);
+    $federacion_id_post = filter_var($_POST['federacion_id'], FILTER_VALIDATE_INT);
     
+    // Para admin, forzar la federación a la suya propia
+    if ($rol === 'admin') {
+        $federacion_id = $_SESSION['usuario_federacion_id'];
+    } else {
+        $federacion_id = $federacion_id_post;
+    }
+        
     if (empty($nombre) || !$federacion_id) {
         $mensaje = 'El nombre y la federación son obligatorios';
         $tipo_mensaje = 'error';
@@ -55,7 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php" class="active"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>
@@ -87,10 +103,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     
                     <div class="form-group">
                         <label>Federación *</label>
-                        <select name="federacion_id" required>
+                        <select name="federacion_id" required <?php echo $rol === 'admin' ? 'disabled' : ''; ?>>
                             <option value="">Seleccione Federación</option>
                             <?php foreach ($federaciones as $federacion): ?>
-                                <option value="<?php echo $federacion['id']; ?>">
+                                <option value="<?php echo $federacion['id']; ?>" <?php echo ($rol === 'admin' && $federacion['id'] == $federacion_id) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($federacion['nombre']); ?>
                                 </option>
                             <?php endforeach; ?>

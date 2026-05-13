@@ -2,10 +2,29 @@
 require_once 'includes/conexion.php';
 verificarAutenticacion();
 
-// Obtener algunos datos para las tarjetas del dashboard
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 $totalFederaciones = $pdo->query("SELECT COUNT(*) FROM federaciones WHERE activo = 1")->fetchColumn();
-$totalEquipos = $pdo->query("SELECT COUNT(*) FROM equipos WHERE activo = 1")->fetchColumn();
-$totalJugadores = $pdo->query("SELECT COUNT(*) FROM jugadores WHERE activo = 1")->fetchColumn();
+
+// Para usuarios admin, filtrar datos de su federación
+if ($rol === 'admin' && $federacion_id) {
+    $totalEquipos = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE federacion_id = ? AND activo = 1");
+    $totalEquipos->execute([$federacion_id]);
+    $totalEquipos = $totalEquipos->fetchColumn();
+    
+    $totalJugadores = $pdo->prepare("
+        SELECT COUNT(*) FROM jugadores j 
+        JOIN equipos e ON j.equipo_id = e.id 
+        WHERE e.federacion_id = ? AND j.activo = 1
+    ");
+    $totalJugadores->execute([$federacion_id]);
+    $totalJugadores = $totalJugadores->fetchColumn();
+}
+else {
+    // Para super admin, mostrar todos los datos
+    $totalEquipos = $pdo->query("SELECT COUNT(*) FROM equipos WHERE activo = 1")->fetchColumn();
+    $totalJugadores = $pdo->query("SELECT COUNT(*) FROM jugadores WHERE activo = 1")->fetchColumn();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -22,7 +41,9 @@ $totalJugadores = $pdo->query("SELECT COUNT(*) FROM jugadores WHERE activo = 1")
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php" class="active"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>
@@ -53,9 +74,14 @@ $totalJugadores = $pdo->query("SELECT COUNT(*) FROM jugadores WHERE activo = 1")
 
             <div class="actions-panel">
                 <h3>Acciones Rápidas</h3>
-                <a href="registro_equipos.php" class="action-btn">Inscribir Equipo</a>
-                <a href="registro_jugadores.php" class="action-btn">Registrar Jugador</a>
-                <a href="registro_federaciones.php" class="action-btn">Registrar Federación</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="registro_equipos.php" class="action-btn">Inscribir Equipo</a>
+                    <a href="registro_jugadores.php" class="action-btn">Registrar Jugador</a>
+                    <a href="registro_federaciones.php" class="action-btn">Registrar Federación</a>
+                <?php elseif ($rol === 'admin'): ?>
+                    <a href="registro_equipos.php" class="action-btn">Inscribir Equipo</a>
+                    <a href="registro_jugadores.php" class="action-btn">Registrar Jugador</a>
+                <?php endif; ?>
             </div>
         </main>
     </div>

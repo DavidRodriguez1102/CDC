@@ -1,34 +1,20 @@
 <?php
 // editar_federacion.php
-session_start();
 
-// Conexión a la base de datos
-$host = 'localhost';
-$dbname = 'soccer_federation';
-$usuario = 'root';
-$password = '';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $usuario, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
-}
+require_once 'includes/conexion.php';
+verificarAutenticacion();
 
-// Función para limpiar datos
-function limpiarInput($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 
-// Verificar autenticación
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: log_in.php');
+if ($rol !== 'super_admin') {
+    header('Location: dashboard.php');
     exit;
 }
+
+$mensaje = '';
+$tipo_mensaje = '';
 
 // Obtener ID de la federación
 $id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_VALIDATE_INT) : 0;
@@ -37,9 +23,6 @@ if (!$id) {
     header('Location: federaciones.php');
     exit;
 }
-
-$mensaje = '';
-$tipo_mensaje = '';
 
 // Obtener datos actuales de la federación
 $stmt = $pdo->prepare("SELECT * FROM federaciones WHERE id = :id AND activo = 1");
@@ -285,7 +268,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php" class="active"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php" class="active"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>
@@ -347,32 +332,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_federacion'
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="departamento">Departamento *</label>
-                                <select id="departamento" name="departamento" required>
-                                    <option value="">Seleccionar ▼</option>
-                                    <?php
-                                    $departamentos = ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Bilbao', 'Zaragoza', 'Málaga', 'Murcia'];
-                                    foreach ($departamentos as $dep): 
-                                    ?>
-                                        <option value="<?php echo $dep; ?>" <?php echo $federacion['departamento'] == $dep ? 'selected' : ''; ?>>
-                                            <?php echo $dep; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                    <input type="text" 
+                                       id="departamento" 
+                                       name="departamento" 
+                                       value="<?php echo htmlspecialchars($federacion['departamento']); ?>" 
+                                       placeholder="Ej:Barcelona, Madrid, etc."
+                                       required>
                             </div>
                             
                             <div class="form-group">
                                 <label for="municipio">Municipio *</label>
-                                <select id="municipio" name="municipio" required>
-                                    <option value="">Seleccionar ▼</option>
-                                    <?php
-                                    $municipios = ['Madrid Centro', 'Barcelona Centro', 'Valencia Centro', 'Sevilla Centro', 'Bilbao Centro', 'Zaragoza Centro'];
-                                    foreach ($municipios as $mun): 
-                                    ?>
-                                        <option value="<?php echo $mun; ?>" <?php echo $federacion['municipio'] == $mun ? 'selected' : ''; ?>>
-                                            <?php echo $mun; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <input type="text" 
+                                       id="municipio" 
+                                       name="municipio" 
+                                       value="<?php echo htmlspecialchars($federacion['municipio']); ?>" 
+                                       placeholder="Ej: Madrid, Barcelona Centro, etc."
+                                       required>
                             </div>
                             
                             <div class="form-group full-width">

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($username) || $password === '') {
         $error = 'Por favor, complete todos los campos.';
     } else {
-        $stmt = $pdo->prepare("SELECT id, password_hash, nombre_completo, rol FROM usuarios WHERE username = :username AND activo = 1");
+        $stmt = $pdo->prepare("SELECT id, password_hash, nombre_completo, rol, federacion_id FROM usuarios WHERE username = :username AND activo = 1");
         $stmt->execute([':username' => $username]);
         $usuario = $stmt->fetch();
 
@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nombre'] = $usuario['nombre_completo'];
             $_SESSION['usuario_rol'] = $usuario['rol'];
+            $_SESSION['usuario_federacion_id'] = $usuario['federacion_id'] ?? null; 
             
             header('Location: dashboard.php');
             exit;

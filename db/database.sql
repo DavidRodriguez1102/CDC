@@ -1,9 +1,9 @@
 -- Crear la base de datos
-CREATE DATABASE IF NOT EXISTS soccer_federation
+CREATE DATABASE IF NOT EXISTS federaciones_football
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
-USE soccer_federation;
+USE federaciones_football;
 
 -- Tabla de Federaciones
 CREATE TABLE federaciones (
@@ -13,6 +13,7 @@ CREATE TABLE federaciones (
     departamento VARCHAR(100) NOT NULL,
     municipio VARCHAR(100) NOT NULL,
     complemento VARCHAR(255),
+    usuario_admin_id INT DEFAULT NULL,
     activo TINYINT(1) NOT NULL DEFAULT 1,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -56,8 +57,14 @@ CREATE TABLE usuarios (
     rol ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin',
     activo TINYINT(1) NOT NULL DEFAULT 1,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    federacion_id INT DEFAULT NULL,
+    FOREIGN KEY (federacion_id) REFERENCES federaciones(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_federacion (federacion_id),
     INDEX idx_username (username)
 ) ENGINE=InnoDB;
+
+-- Agregar foreign key para usuario_admin_id en federaciones
+ALTER TABLE federaciones ADD CONSTRAINT fk_usuario_admin FOREIGN KEY (usuario_admin_id) REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- Insertar datos de ejemplo
 INSERT INTO federaciones (nombre, fecha_fundacion, departamento, municipio, complemento) VALUES
@@ -80,6 +87,20 @@ INSERT INTO jugadores (nombre, fecha_nacimiento, genero, equipo_id) VALUES
 ('Alexia Putellas', '1994-02-04', 'femenino', 1),
 ('Aitana Bonmatí', '1998-01-18', 'femenino', 3);
 
--- Insertar usuario admin por defecto (contraseña: password)
-INSERT INTO usuarios (username, password_hash, nombre_completo, rol) VALUES
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrador Principal', 'super_admin');
+-- Insertar admins para las federaciones existentes
+-- (contraseña para todos: password)
+
+INSERT INTO usuarios (username, password_hash, nombre_completo, rol, federacion_id) VALUES
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrador Principal', 'super_admin',NULL),
+('fed_madrilena_admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Federación Madrileña', 'admin', 1),
+('fed_catalana_admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Federación Catalana', 'admin', 2),
+('fed_andaluza_admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Federación Andaluza', 'admin', 3),
+('fed_vasca_admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Federación Vasca', 'admin', 4),
+('fed_gallega_admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Federación Gallega', 'admin', 5);
+
+-- Finalmente actualizar las federaciones con el usuario_admin_id
+UPDATE federaciones SET usuario_admin_id = 2 WHERE id = 1;
+UPDATE federaciones SET usuario_admin_id = 3 WHERE id = 2;
+UPDATE federaciones SET usuario_admin_id = 4 WHERE id = 3;
+UPDATE federaciones SET usuario_admin_id = 5 WHERE id = 4;
+UPDATE federaciones SET usuario_admin_id = 6 WHERE id = 5;

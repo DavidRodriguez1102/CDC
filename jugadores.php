@@ -4,11 +4,20 @@ verificarAutenticacion();
 
 $busqueda = isset($_GET['buscar']) ? limpiarInput($_GET['buscar']) : '';
 
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
+
+
 $sql = "SELECT j.*, e.nombre as nombre_equipo, f.nombre as nombre_federacion
         FROM jugadores j
         LEFT JOIN equipos e ON j.equipo_id = e.id
         LEFT JOIN federaciones f ON e.federacion_id = f.id
         WHERE j.activo = 1";
+
+// Si es admin, solo ve jugadores de equipos de su federación
+if ($rol === 'admin' && $federacion_id) {
+    $sql .= " AND e.federacion_id = :federacion_id";
+}
 
 if ($busqueda) {
     $sql .= " AND (j.nombre LIKE :busqueda OR j.id LIKE :busqueda2)";
@@ -17,12 +26,28 @@ if ($busqueda) {
 $sql .= " ORDER BY j.nombre";
 
 $stmt = $pdo->prepare($sql);
-if ($busqueda) {
-    $stmt->execute([':busqueda' => "%$busqueda%", ':busqueda2' => "%$busqueda%"]);
+if ($rol === 'admin' && $federacion_id) {
+    if ($busqueda) {
+        $stmt->execute([
+            ':federacion_id' => $federacion_id,
+            ':busqueda' => "%$busqueda%",
+            ':busqueda2' => "%$busqueda%"
+        ]);
+    } else {
+        $stmt->execute([':federacion_id' => $federacion_id]);
+    }
 } else {
-    $stmt->execute();
+    if ($busqueda) {
+        $stmt->execute([':busqueda' => "%$busqueda%", ':busqueda2' => "%$busqueda%"]);
+    } else {
+        $stmt->execute();
+    }
 }
+
 $jugadores = $stmt->fetchAll();
+
+// Obtener estadísticas
+$total_jugadores = count($jugadores);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -39,7 +64,9 @@ $jugadores = $stmt->fetchAll();
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php"> Equipos</a>
                 <a href="jugadores.php" class="active"> Jugadores</a>
                 <hr>
@@ -51,8 +78,12 @@ $jugadores = $stmt->fetchAll();
         <main class="main-content">
             <header>
                 <h2>Lista de Jugadores</h2>
+                <p style="color: #718096; margin-top: 0.25rem;">
+                    <?php echo $total_jugadores; ?> jugador(es)<?php echo $rol === 'admin' ? ' en mi federación' : ' registrados'; ?>
+                </p>
                 <a href="registro_jugadores.php" class="btn btn-primary">+ Registrar Jugador</a>
             </header>
+            
             
             <div class="search-box">
                 <form method="GET" action="">

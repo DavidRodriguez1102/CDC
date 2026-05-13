@@ -1,27 +1,11 @@
 <?php
 // ver_federacion.php
-session_start();
 
-// Conexión a la base de datos
-$host = 'localhost';
-$dbname = 'soccer_federation';
-$usuario = 'root';
-$password = '';
+require_once __DIR__ . '/includes/conexion.php';
+verificarAutenticacion();
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $usuario, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
-}
-
-// Verificar autenticación
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: log_in.php');
-    exit;
-}
-
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 $error_mensaje = '';
 
 // Manejar eliminación directa desde este mismo archivo
@@ -29,29 +13,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['federacion_id'])) {
     $federacion_id = filter_var($_POST['federacion_id'], FILTER_VALIDATE_INT);
     if ($federacion_id) {
         try {
-            $stmtEquipos = $pdo->prepare("SELECT COUNT(*) FROM equipos WHERE federacion_id = :id AND activo = 1");
-            $stmtEquipos->execute([':id' => $federacion_id]);
-            $total_equipos = $stmtEquipos->fetchColumn();
-
-            $stmtJugadores = $pdo->prepare(
-                "SELECT COUNT(*) FROM jugadores j 
-                 JOIN equipos e ON j.equipo_id = e.id 
-                 WHERE e.federacion_id = :id AND j.activo = 1"
+            // Iniciar transacción para garantizar consistencia
+            $pdo->beginTransaction();
+            
+            // 1. Eliminar todos los jugadores de los equipos de esta federación
+            $stmtDesactivarJugadores = $pdo->prepare(
+                "DELETE FROM jugadores 
+                 WHERE equipo_id IN (SELECT id FROM equipos WHERE federacion_id = :id)"
             );
-            $stmtJugadores->execute([':id' => $federacion_id]);
-            $total_jugadores = $stmtJugadores->fetchColumn();
-
-            if ($total_equipos > 0) {
-                $error_mensaje = "No se puede eliminar la federación porque tiene $total_equipos equipos activos asignados.";
-            } elseif ($total_jugadores > 0) {
-                $error_mensaje = "No se puede eliminar la federación porque sus equipos tienen $total_jugadores jugadores activos asignados.";
-            } else {
-                $stmtDeleteFederacion = $pdo->prepare("UPDATE federaciones SET activo = 0 WHERE id = :id");
-                $stmtDeleteFederacion->execute([':id' => $federacion_id]);
-                header('Location: federaciones.php');
-                exit;
-            }
+            $stmtDesactivarJugadores->execute([':id' => $federacion_id]);
+            
+            // 2. Eliminar todos los equipos de la federación
+            $stmtDesactivarEquipos = $pdo->prepare("DELETE FROM equipos WHERE federacion_id = :id");
+            $stmtDesactivarEquipos->execute([':id' => $federacion_id]);
+            
+            // 3. Eliminar el usuario admin de la federación (si existe)
+            $stmtDesactivarUsuario = $pdo->prepare("DELETE FROM usuarios WHERE federacion_id = :id AND rol = 'admin'");
+            $stmtDesactivarUsuario->execute([':id' => $federacion_id]);
+            
+            // 4. Eliminar la federación
+            $stmtDesactivarFederacion = $pdo->prepare("DELETE FROM federaciones WHERE id = :id");
+            $stmtDesactivarFederacion->execute([':id' => $federacion_id]);
+            
+            // Confirmar la transacción
+            $pdo->commit();
+            
+            header('Location: federaciones.php');
+            exit;
         } catch (PDOException $e) {
+            // Revertir la transacción en caso de error
+            $pdo->rollBack();
             $error_mensaje = "Error al eliminar la federación: " . $e->getMessage();
         }
     }
@@ -328,8 +319,9 @@ $antiguedad = $hoy->diff($fecha_fundacion)->y;
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php" class="active"> Federaciones</a>
-                <a href="equipos.php"> Equipos</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php" class="active"> Federaciones</a>
+                <?php endif; ?>                <a href="equipos.php"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>
                 <a href="configuracion_usuarios.php"> Configuración</a>

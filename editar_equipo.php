@@ -1,34 +1,10 @@
 <?php
 // editar_equipo.php
-session_start();
+require_once 'includes/conexion.php';
+verificarAutenticacion();
 
-// Conexión a la base de datos
-$host = 'localhost';
-$dbname = 'soccer_federation';
-$usuario = 'root';
-$password = '';
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $usuario, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
-}
-
-// Función para limpiar datos
-function limpiarInput($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
-
-// Verificar autenticación
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: log_in.php');
-    exit;
-}
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 
 // Obtener ID del equipo
 $id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_VALIDATE_INT) : 0;
@@ -42,11 +18,17 @@ $mensaje = '';
 $tipo_mensaje = '';
 
 // Obtener datos actuales del equipo
-$stmt = $pdo->prepare("SELECT e.*, f.nombre as nombre_federacion FROM equipos e LEFT JOIN federaciones f ON e.federacion_id = f.id WHERE e.id = :id AND e.activo = 1");
+$stmt = $pdo->prepare("SELECT e.id, e.nombre, e.federacion_id, f.nombre as nombre_federacion FROM equipos e LEFT JOIN federaciones f ON e.federacion_id = f.id WHERE e.id = :id");
 $stmt->execute([':id' => $id]);
 $equipo = $stmt->fetch();
 
 if (!$equipo) {
+    header('Location: equipos.php');
+    exit;
+}
+
+// Verificar permisos: si es admin, solo puede editar equipos de su federación
+if ($rol === 'admin' && $federacion_id && isset($equipo['federacion_id']) && $equipo['federacion_id'] != $federacion_id) {
     header('Location: equipos.php');
     exit;
 }
@@ -57,7 +39,14 @@ $federaciones = $pdo->query("SELECT id, nombre FROM federaciones WHERE activo = 
 // Procesar formulario de actualización
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_equipo'])) {
     $nombre = limpiarInput($_POST['nombre']);
-    $federacion_id = filter_var($_POST['federacion_id'], FILTER_VALIDATE_INT);
+    $federacion_id_post = filter_var($_POST['federacion_id'], FILTER_VALIDATE_INT);
+    
+    // Para admin, forzar la federación a la suya propia
+    if ($rol === 'admin') {
+        $federacion_id = $_SESSION['usuario_federacion_id'];
+    } else {
+        $federacion_id = $federacion_id_post;
+    }
     
     if (empty($nombre) || !$federacion_id) {
         $mensaje = 'El nombre y la federación son obligatorios.';
@@ -250,7 +239,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_equipo'])) 
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php" class="active"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>
@@ -297,7 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_equipo'])) 
                     
                     <div class="form-group">
                         <label for="federacion_id">Federación *</label>
-                        <select id="federacion_id" name="federacion_id" required>
+                        <select id="federacion_id" name="federacion_id" required <?php echo $rol === 'admin' ? 'disabled' : ''; ?>>
                             <option value="">Seleccione Federación</option>
                             <?php foreach ($federaciones as $federacion): ?>
                                 <option value="<?php echo $federacion['id']; ?>" 

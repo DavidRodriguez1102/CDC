@@ -6,7 +6,6 @@ $mensaje = '';
 $tipo_mensaje = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id_federacion = limpiarInput($_POST['id_federacion']);
     $nombre = limpiarInput($_POST['nombre']);
     $fecha_fundacion = $_POST['fecha_fundacion'];
     $departamento = limpiarInput($_POST['departamento']);
@@ -16,6 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validaciones
     if (empty($nombre) || empty($fecha_fundacion) || empty($departamento) || empty($municipio)) {
         $mensaje = 'Todos los campos marcados con * son obligatorios';
+        $tipo_mensaje = 'error';
+    } elseif ($fecha_fundacion > date('Y-m-d')) {
+        $mensaje = 'La fecha de fundación no puede ser futura';
         $tipo_mensaje = 'error';
     } else {
         // Verificar si ya existe una federación con el mismo nombre
@@ -38,7 +40,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     ':complemento' => $complemento
                 ]);
                 
-                $mensaje = 'Federación registrada exitosamente';
+                // Obtener el ID de la federación recién creada
+                $federacion_id = $pdo->lastInsertId();
+
+                // Generar credenciales para el admin de la federación
+                $username_admin = 'fed_' . strtolower(str_replace(' ', '_', substr($nombre, 0, 15))) . '_admin';
+                $password_admin = generarPasswordSeguro();
+                $password_hash = password_hash($password_admin, PASSWORD_DEFAULT);
+                $nombre_completo = 'Admin ' . $nombre;
+
+                // Insertar usuario admin para esta federación
+                $stmtUser = $pdo->prepare("
+                    INSERT INTO usuarios (username, password_hash, nombre_completo, rol, federacion_id) 
+                    VALUES (:username, :password_hash, :nombre_completo, 'admin', :federacion_id)
+                ");
+                $stmtUser->execute([
+                    ':username' => $username_admin,
+                    ':password_hash' => $password_hash,
+                    ':nombre_completo' => $nombre_completo,
+                    ':federacion_id' => $federacion_id
+                ]);
+
+                // Vincular el usuario admin a la federación
+                $usuario_admin_id = $pdo->lastInsertId();
+                $stmtUpdateFed = $pdo->prepare("UPDATE federaciones SET usuario_admin_id = :user_id WHERE id = :fed_id");
+                $stmtUpdateFed->execute([':user_id' => $usuario_admin_id, ':fed_id' => $federacion_id]);
+
+                // Mostrar credenciales en el mensaje
+                $mensaje = "Federación registrada exitosamente. 
+                            Usuario Admin: <strong>$username_admin</strong> 
+                            Contraseña: <strong>$password_admin</strong>";
                 $tipo_mensaje = 'success';
             } catch (PDOException $e) {
                 $mensaje = 'Error al registrar: ' . $e->getMessage();

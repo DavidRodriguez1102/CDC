@@ -1,27 +1,12 @@
 <?php
 // ver_equipo.php
-session_start();
 
-// Conexión a la base de datos
-$host = 'localhost';
-$dbname = 'soccer_federation';
-$usuario = 'root';
-$password = '';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $usuario, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
-}
+require_once 'includes/conexion.php';
+verificarAutenticacion();
 
-// Verificar autenticación
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: log_in.php');
-    exit;
-}
-
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 $error_mensaje = '';
 
 // Manejar eliminación directa desde este mismo archivo
@@ -36,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['equipo_id'])) {
             if ($total_jugadores > 0) {
                 $error_mensaje = "No se puede eliminar el equipo porque tiene $total_jugadores jugadores activos asignados.";
             } else {
-                $stmtDeleteEquipo = $pdo->prepare("UPDATE equipos SET activo = 0 WHERE id = :id");
+                $stmtDeleteEquipo = $pdo->prepare("DELETE FROM equipos WHERE id = :id");
                 $stmtDeleteEquipo->execute([':id' => $equipo_id]);
                 header('Location: equipos.php');
                 exit;
@@ -66,6 +51,12 @@ $stmt->execute([':id' => $id]);
 $equipo = $stmt->fetch();
 
 if (!$equipo) {
+    header('Location: equipos.php');
+    exit;
+}
+
+// Verificar permisos: si es admin, solo puede ver equipos de su federación
+if ($rol === 'admin' && $federacion_id && $equipo['federacion_id'] != $federacion_id) {
     header('Location: equipos.php');
     exit;
 }
@@ -292,7 +283,9 @@ foreach ($jugadores as $jugador) {
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php" class="active"> Equipos</a>
                 <a href="jugadores.php"> Jugadores</a>
                 <hr>

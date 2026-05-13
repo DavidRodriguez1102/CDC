@@ -1,32 +1,17 @@
 <?php
 // ver_jugador.php
-session_start();
 
-// Conexión a la base de datos
-$host = 'localhost';
-$dbname = 'soccer_federation';
-$usuario = 'root';
-$password = '';
+require_once __DIR__ . '/includes/conexion.php';
+verificarAutenticacion();
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $usuario, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
-}
-
-// Verificar autenticación
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: log_in.php');
-    exit;
-}
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 
 // Manejar eliminación directa desde este mismo archivo
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['jugador_id'])) {
     $jugador_id = filter_var($_POST['jugador_id'], FILTER_VALIDATE_INT);
     if ($jugador_id) {
-        $stmtDelete = $pdo->prepare("UPDATE jugadores SET activo = 0 WHERE id = :id");
+        $stmtDelete = $pdo->prepare("DELETE FROM jugadores WHERE id = :id");
         $stmtDelete->execute([':id' => $jugador_id]);
     }
     header('Location: jugadores.php');
@@ -57,6 +42,12 @@ $stmt->execute([':id' => $id]);
 $jugador = $stmt->fetch();
 
 if (!$jugador) {
+    header('Location: jugadores.php');
+    exit;
+}
+
+// Verificar permisos: si es admin, solo puede ver jugadores de equipos de su federación
+if ($rol === 'admin' && $federacion_id && $jugador['federacion_id'] != $federacion_id) {
     header('Location: jugadores.php');
     exit;
 }
@@ -229,7 +220,9 @@ $edad = $hoy->diff($fecha_nacimiento)->y;
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php"> Equipos</a>
                 <a href="jugadores.php" class="active"> Jugadores</a>
                 <hr>

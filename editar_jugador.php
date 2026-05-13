@@ -1,34 +1,15 @@
 <?php
 // editar_jugador.php
-session_start();
 
-// Conexión a la base de datos
-$host = 'localhost';
-$dbname = 'soccer_federation';
-$usuario = 'root';
-$password = '';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $usuario, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
-}
+require_once 'includes/conexion.php';
+verificarAutenticacion();
 
-// Función para limpiar datos
-function limpiarInput($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
+$rol = $_SESSION['usuario_rol'] ?? '';
+$federacion_id = $_SESSION['usuario_federacion_id'] ?? null;
 
-// Verificar autenticación
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: log_in.php');
-    exit;
-}
+$mensaje = '';
+$tipo_mensaje = '';
 
 // Obtener ID del jugador
 $id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_VALIDATE_INT) : 0;
@@ -38,11 +19,13 @@ if (!$id) {
     exit;
 }
 
-$mensaje = '';
-$tipo_mensaje = '';
-
 // Obtener datos actuales del jugador
-$stmt = $pdo->prepare("SELECT * FROM jugadores WHERE id = :id AND activo = 1");
+$stmt = $pdo->prepare("
+    SELECT j.*, e.federacion_id
+    FROM jugadores j
+    LEFT JOIN equipos e ON j.equipo_id = e.id
+    WHERE j.id = :id AND j.activo = 1
+");
 $stmt->execute([':id' => $id]);
 $jugador = $stmt->fetch();
 
@@ -51,8 +34,19 @@ if (!$jugador) {
     exit;
 }
 
+// Verificar permisos: si es admin, solo puede editar jugadores de equipos de su federación
+if ($rol === 'admin' && $federacion_id && $jugador['federacion_id'] != $federacion_id) {
+    header('Location: jugadores.php');
+    exit;
+}
+
 // Obtener todos los equipos para el selector
-$stmtEquipos = $pdo->query("SELECT id, nombre FROM equipos WHERE activo = 1 ORDER BY nombre");
+if ($rol === 'admin' && $federacion_id) {
+    $stmtEquipos = $pdo->prepare("SELECT id, nombre FROM equipos WHERE activo = 1 AND federacion_id = :federacion_id ORDER BY nombre");
+    $stmtEquipos->execute([':federacion_id' => $federacion_id]);
+} else {
+    $stmtEquipos = $pdo->query("SELECT id, nombre FROM equipos WHERE activo = 1 ORDER BY nombre");
+}
 $equipos = $stmtEquipos->fetchAll();
 
 // Procesar formulario de actualización
@@ -271,7 +265,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['actualizar_jugador']))
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php"> Dashboard</a>
-                <a href="federaciones.php"> Federaciones</a>
+                                <?php if ($rol === 'super_admin'): ?>
+                    <a href="federaciones.php"> Federaciones</a>
+                <?php endif; ?>
                 <a href="equipos.php"> Equipos</a>
                 <a href="jugadores.php" class="active"> Jugadores</a>
                 <hr>

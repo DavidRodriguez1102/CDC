@@ -2,7 +2,7 @@
 session_start();
 
 $host = 'localhost';
-$dbname = 'soccer_federation';
+$dbname = 'federaciones_football';
 $usuario = 'root';
 $password = '';
 
@@ -65,5 +65,14 @@ function subirArchivo($archivo, $directorio, $tipos_permitidos = ['jpg', 'jpeg',
     } else {
         return ['success' => false, 'mensaje' => 'Error al mover el archivo'];
     }
+}
+//Función para generar contraseña segura
+function generarPasswordSeguro($longitud = 10) {
+    $caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
+    $password = '';
+    for ($i = 0; $i < $longitud; $i++) {
+        $password .= $caracteres[rand(0, strlen($caracteres) - 1)];
+    }
+    return $password;
 }
 ?>
